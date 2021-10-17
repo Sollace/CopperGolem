@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "waxed_copper_block",
+  "ingredients": [
+    {
+      "item": "copper_golem:oxidized_copper_button"
+    },
+    {
+      "item": "minecraft:honeycomb"
+    }
+  ],
+  "result": {
+    "item": "copper_golem:waxed_oxidized_copper_button"
+  }
+}

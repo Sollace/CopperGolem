@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "copper_golem:waxed_copper_button",
+    "copper_golem:waxed_exposed_copper_button",
+    "copper_golem:waxed_weathered_copper_button",
+    "copper_golem:waxed_oxidized_copper_button"
+  ]
+}
