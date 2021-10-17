@@ -8,6 +8,8 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import com.sollace.coppergolem.entity.CopperGolemEntity;
+
 public class CopperButtonBlock extends AbstractButtonBlock implements CustomDurationButton {
     protected final Oxidizable.OxidizationLevel oxidizationLevel;
 
@@ -32,5 +34,10 @@ public class CopperButtonBlock extends AbstractButtonBlock implements CustomDura
         if (!moved && newState.getBlock() instanceof CopperButtonBlock && newState.get(POWERED)) {
             world.getBlockTickScheduler().schedule(pos, newState.getBlock(), ((CopperButtonBlock)newState.getBlock()).getCustomPressTicks());
         }
-     }
+    }
+
+    public void powerOn(BlockState state, World world, BlockPos pos) {
+        super.powerOn(state, world, pos);
+        CopperGolemEntity.tryBuild(world, pos.offset(state.get(FACING).getOpposite()));
+    }
 }
