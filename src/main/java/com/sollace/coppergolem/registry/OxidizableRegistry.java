@@ -5,61 +5,62 @@ import net.minecraft.block.Oxidizable;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.sollace.coppergolem.Main;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.function.Supplier;
 
 public final class OxidizableRegistry {
     public static final OxidizableRegistry INSTANCE = new OxidizableRegistry();
 
     private final BiMap<Block, Block> entries = HashBiMap.create();
+    private final BiMap<Block, Block> compiled = HashBiMap.create();
 
     private Supplier<BiMap<Block, Block>> vanilla;
-
-    private BiMap<Block, Block> compiled;
 
     private OxidizableRegistry() {}
 
     public void register(Block normal, Block exposed, Block weathered, Block oxidized) {
         entries.put(normal, exposed);
-        entries.put(exposed, oxidized);
-        entries.put(oxidized, weathered);
-        compiled = null;
+        entries.put(exposed, weathered);
+        entries.put(weathered, oxidized);
+        compiled.clear();
         init();
     }
 
+    @SuppressWarnings("unchecked")
     private void init() {
         if (vanilla != null) {
             return;
         }
 
-        vanilla = Oxidizable.OXIDATION_LEVEL_INCREASES;
+        var replacing = Oxidizable.OXIDATION_LEVEL_INCREASES;
 
-        Field[] fields = Oxidizable.class.getDeclaredFields();
+        var c = replacing.getClass();
+
+        var fields = c.getDeclaredFields();
+
         for (var f : fields) {
             try {
-                makeMutable(f);
-                if (f.get(null) == vanilla) {
-                    f.set(null, (Supplier<BiMap<Block, Block>>)(() -> {
-                        if (compiled == null) {
-                            compiled = HashBiMap.create(vanilla.get());
+                f.setAccessible(true);
+                if (f.getType() == com.google.common.base.Supplier.class) {
+                    vanilla = (com.google.common.base.Supplier<BiMap<Block, Block>>)f.get(replacing);
+                    if (vanilla == null) {
+                        var data = replacing.get();
+                        vanilla = () -> data;
+                    }
+                    f.set(replacing, (com.google.common.base.Supplier<BiMap<Block, Block>>)(() -> {
+                        if (compiled.isEmpty()) {
+                            compiled.putAll(vanilla.get());
                             compiled.putAll(entries);
                         }
                         return compiled;
                     }));
+                } else if ("initialized".equals(f.getName())) {
+                    f.set(replacing, false);
                 }
-            } catch (ReflectiveOperationException e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
+                Main.LOGGER.error(e);
             }
-            return;
         }
-    }
-
-    private static void makeMutable(Field f) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-        f.setAccessible(true);
-        Field modifiers = Field.class.getDeclaredField("modifiers");
-        modifiers.setAccessible(true);
-        modifiers.set(f, f.getModifiers() & ~Modifier.FINAL);
     }
 }

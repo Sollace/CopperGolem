@@ -15,8 +15,12 @@ public class OxidizableCopperButtonBlock extends CopperButtonBlock implements Ox
 
     @Override
     public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        super.randomTick(state, world, pos, random);
         tickDegradation(state, world, pos, random);
+    }
+
+    @Override
+    public boolean hasRandomTicks(BlockState state) {
+        return super.hasRandomTicks(state) || Oxidizable.getIncreasedOxidationBlock(state.getBlock()).isPresent();
     }
 
     @Override
