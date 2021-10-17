@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "copper_golem",
+  "version": "${version}",
+  "name": "Copper Golem",
+  "description": "${description}",
+  "authors": [
+    "Sollace"
+  ],
+  "contact": {
+    "sources": "https://github.com/Sollace/CopperGolem",
+    "issues": "https://github.com/Sollace/CopperGolem/issues"
+  },
+  "license": "MIT",
+  "icon": "copper_golem_logo.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.sollace.coppergolem.Main"
+    ],
+    "client": [
+      "com.sollace.coppergolem.client.Main"
+    ]
+  },
+  "mixins": [
+    "copper_golem.mixin.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.4.0",
+    "fabric-api-base": ">=0.1.0",
+    "fabric-events-lifecycle-v0": ">=0.1.0",
+    "fabric-resource-loader-v0": ">=0.1.0"
+  }
+}
