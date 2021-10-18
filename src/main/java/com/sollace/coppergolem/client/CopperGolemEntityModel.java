@@ -65,9 +65,6 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
 
     @Override
     public ModelPart getPart() {
-       // rightArm.pitch = 0.2F + (float)Math.random();
-       // leftArm.pitch = 0.2F + (float)Math.random();
-       // nose.roll = (float)Math.random() - 0.5F;
         return root;
     }
 
@@ -76,15 +73,30 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
         root.pivotY = 20;
         root.yaw = (float)Math.PI;
 
-        this.head.yaw = headYaw * 0.017453292F;
-        this.head.pitch = -headPitch * 0.017453292F;
+        float headSpinTime = (float)entity.getHeadSpinTime() / 10;
 
-        this.rightLeg.pitch = -1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
-        this.leftLeg.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+        float maxRotation = 2 * (float)Math.PI;
 
-        this.rightArm.pitch = -1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
-        this.leftArm.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+        head.yaw = headYaw * 0.017453292F + MathHelper.lerp(headSpinTime, 0, maxRotation);
+        head.pitch = -headPitch * 0.017453292F;
 
-        this.nose.roll = MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+        rightLeg.pitch = -1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+        leftLeg.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+
+        rightArm.pitch = -1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+        leftArm.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+
+        body.pitch = MathHelper.lerp(entity.handSwingProgress, 0, -0.25F);
+        rightArm.pitch +=  MathHelper.lerp(entity.handSwingProgress, 0, 1.5F);
+        leftArm.pitch +=  MathHelper.lerp(entity.handSwingProgress, 0, 1.5F);
+
+        rightArm.pitch = MathHelper.lerp(headSpinTime, rightArm.pitch, root.yaw);
+        leftArm.pitch = MathHelper.lerp(headSpinTime, leftArm.pitch, root.yaw);
+
+        if (!entity.isWigglingNose()) {
+            nose.pitch = MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+        } else {
+            nose.roll = (float)Math.random() - 0.5F;
+        }
     }
 }

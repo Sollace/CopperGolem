@@ -46,6 +46,8 @@ import java.util.function.Consumer;
 public class CopperGolemEntity extends GolemEntity {
 
     protected static final TrackedData<Integer> OXIDATION = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    protected static final TrackedData<Integer> WIGGLING_NOSE_TIME = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    protected static final TrackedData<Integer> SPINNING_HEAD_TIME = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
     public static final byte SCRAPE_STATUS = 4;
 
@@ -70,12 +72,15 @@ public class CopperGolemEntity extends GolemEntity {
         goalSelector.add(2, new WanderAroundPointOfInterestGoal(this, 0.6, false));
         goalSelector.add(7, new LookAtEntityGoal(this, PlayerEntity.class, 6));
         goalSelector.add(8, new LookAroundGoal(this));
+        targetSelector.add(1, new PressButtonGoal(this, 14, 30));
     }
 
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
         dataTracker.startTracking(OXIDATION, 0);
+        dataTracker.startTracking(WIGGLING_NOSE_TIME, 0);
+        dataTracker.startTracking(SPINNING_HEAD_TIME, 0);
     }
 
     public void setOxidation(int oxidation) {
@@ -98,9 +103,25 @@ public class CopperGolemEntity extends GolemEntity {
         setOxidation(level.ordinal() * 100);
     }
 
+    public boolean isWigglingNose() {
+        return dataTracker.get(WIGGLING_NOSE_TIME) > 0;
+    }
+
+    public void wiggleNose() {
+        dataTracker.set(WIGGLING_NOSE_TIME, 10);
+    }
+
+    public int getHeadSpinTime() {
+        return dataTracker.get(SPINNING_HEAD_TIME);
+    }
+
+    public void spinHead() {
+        dataTracker.set(SPINNING_HEAD_TIME, 10);
+    }
+
     @Override
     public float getMovementSpeed() {
-        return super.getMovementSpeed() / (1 + getDegradationLevel().ordinal());
+        return 0.6F / (1 + getDegradationLevel().ordinal());
     }
 
     @Override
@@ -111,18 +132,35 @@ public class CopperGolemEntity extends GolemEntity {
     @Override
     public void tickMovement() {
         super.tickMovement();
+        tickHandSwing();
 
         if (random.nextFloat() < 0.05688889F) {
             setOxidation(getOxidation() + 1);
+        }
+
+        if (isWigglingNose()) {
+            dataTracker.set(WIGGLING_NOSE_TIME, dataTracker.get(WIGGLING_NOSE_TIME) - 1);
+        }
+        if (getHeadSpinTime() > 0) {
+            dataTracker.set(SPINNING_HEAD_TIME, dataTracker.get(SPINNING_HEAD_TIME) - 1);
+        }
+
+        if (getRandom().nextInt(1200) == 0) {
+            wiggleNose();
+        }
+
+        if (getNavigation().isIdle() && getRandom().nextInt(600) == 0) {
+            spinHead();
         }
     }
 
     protected ActionResult interactMob(PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
-        if (stack.isIn(FabricToolTags.AXES) && getOxidation() >= 100) {
+        if (stack.isIn(FabricToolTags.AXES) && getOxidation() >= 0) {
             setOxidation(100 * (getDegradationLevel().ordinal() - 1));
             stack.damage(1, player, t -> t.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
             world.sendEntityStatus(this, SCRAPE_STATUS);
+            playSound(SoundEvents.ITEM_AXE_SCRAPE, 1, 1);
 
             return ActionResult.SUCCESS;
         }
@@ -145,7 +183,6 @@ public class CopperGolemEntity extends GolemEntity {
     @Override
     public void handleStatus(byte status) {
         if (status == SCRAPE_STATUS) {
-            playSound(SoundEvents.ITEM_AXE_SCRAPE, 1, 1);
             produceParticles(ParticleTypes.SCRAPE);
         } else {
            super.handleStatus(status);
@@ -208,6 +245,8 @@ public class CopperGolemEntity extends GolemEntity {
         golem.headYaw = result.getForwards().asRotation();
 
         world.spawnEntity(golem);
+
+        golem.spinHead();
 
         iterateAround(result, position -> {
             world.updateNeighbors(position.getBlockPos(), Blocks.AIR);
