@@ -1,6 +1,5 @@
 package com.sollace.coppergolem.client;
 
-import net.minecraft.client.model.Dilation;
 import net.minecraft.client.model.ModelData;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.model.ModelPartBuilder;
@@ -14,16 +13,24 @@ import net.minecraft.util.math.MathHelper;
 import com.sollace.coppergolem.entity.CopperGolemEntity;
 
 public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEntity> {
+
     private final ModelPart root;
+
+    private final ModelPart body;
     private final ModelPart head;
+    private final ModelPart nose;
+
     private final ModelPart rightArm;
     private final ModelPart leftArm;
+
     private final ModelPart rightLeg;
     private final ModelPart leftLeg;
 
     public CopperGolemEntityModel(ModelPart root) {
         this.root = root;
-        this.head = root.getChild(EntityModelPartNames.HEAD);
+        this.body = root.getChild(EntityModelPartNames.BODY);
+        this.head = body.getChild(EntityModelPartNames.HEAD);
+        this.nose = head.getChild(EntityModelPartNames.NOSE);
         this.rightArm = root.getChild(EntityModelPartNames.RIGHT_ARM);
         this.leftArm = root.getChild(EntityModelPartNames.LEFT_ARM);
         this.rightLeg = root.getChild(EntityModelPartNames.RIGHT_LEG);
@@ -31,29 +38,53 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
      }
 
      public static TexturedModelData getTexturedModelData() {
-        ModelData modelData = new ModelData();
-        ModelPartData modelPartData = modelData.getRoot();
-        modelPartData.addChild(EntityModelPartNames.HEAD, ModelPartBuilder.create().uv(0, 0).cuboid(-4.0F, -12.0F, -5.5F, 8.0F, 10.0F, 8.0F).uv(24, 0).cuboid(-1.0F, -5.0F, -7.5F, 2.0F, 4.0F, 2.0F), ModelTransform.pivot(0.0F, -7.0F, -2.0F));
-        modelPartData.addChild(EntityModelPartNames.BODY, ModelPartBuilder.create().uv(0, 40).cuboid(-9.0F, -2.0F, -6.0F, 18.0F, 12.0F, 11.0F).uv(0, 70).cuboid(-4.5F, 10.0F, -3.0F, 9.0F, 5.0F, 6.0F, new Dilation(0.5F)), ModelTransform.pivot(0.0F, -7.0F, 0.0F));
-        modelPartData.addChild(EntityModelPartNames.RIGHT_ARM, ModelPartBuilder.create().uv(60, 21).cuboid(-13.0F, -2.5F, -3.0F, 4.0F, 30.0F, 6.0F), ModelTransform.pivot(0.0F, -7.0F, 0.0F));
-        modelPartData.addChild(EntityModelPartNames.LEFT_ARM, ModelPartBuilder.create().uv(60, 58).cuboid(9.0F, -2.5F, -3.0F, 4.0F, 30.0F, 6.0F), ModelTransform.pivot(0.0F, -7.0F, 0.0F));
-        modelPartData.addChild(EntityModelPartNames.RIGHT_LEG, ModelPartBuilder.create().uv(37, 0).cuboid(-3.5F, -3.0F, -3.0F, 6.0F, 16.0F, 5.0F), ModelTransform.pivot(-4.0F, 11.0F, 0.0F));
-        modelPartData.addChild(EntityModelPartNames.LEFT_LEG, ModelPartBuilder.create().uv(60, 0).mirrored().cuboid(-3.5F, -3.0F, -3.0F, 6.0F, 16.0F, 5.0F), ModelTransform.pivot(5.0F, 11.0F, 0.0F));
-        return TexturedModelData.of(modelData, 128, 128);
+        ModelData data = new ModelData();
+        ModelPartData root = data.getRoot();
+
+        root.addChild(EntityModelPartNames.BODY, ModelPartBuilder.create()
+                .uv(0, 13).cuboid(-4, -7, -3, 8, 7, 5), ModelTransform.NONE)
+                .addChild(EntityModelPartNames.HEAD, ModelPartBuilder.create()
+                        .uv(36, 31).cuboid(-1, -1, -1.5F, 2, 2, 2)
+                        .uv(0, 0).cuboid(-4, -5, -4, 8, 5, 7)
+                        .uv(26, 16).cuboid(-1, -7, -1.5F, 2, 2, 2)
+                        .uv(0, 32).cuboid(-1.5F, -9, -2, 3, 2, 3), ModelTransform.pivot(0, -7, 0))
+                        .addChild(EntityModelPartNames.NOSE, ModelPartBuilder.create()
+                                .uv(36, 26).cuboid(-1, -1, 2, 2, 3, 2), ModelTransform.NONE);
+        root.addChild(EntityModelPartNames.RIGHT_ARM, ModelPartBuilder.create()
+                .uv(16, 26).cuboid(0, -2, -1.5F, 2, 9, 3), ModelTransform.pivot(-6, -6, -0.5F));
+        root.addChild(EntityModelPartNames.LEFT_ARM, ModelPartBuilder.create()
+                .uv(26, 26).cuboid(0, -2, -1.5F, 2, 9, 3), ModelTransform.pivot(4, -6, -0.5F));
+        root.addChild(EntityModelPartNames.RIGHT_LEG, ModelPartBuilder.create()
+                .uv(26, 9).cuboid(-2, 0, -3, 4, 3, 4)
+                .uv(23, 0).cuboid(-2, 3, -3, 4, 1, 5), ModelTransform.pivot(-2, 0, 0));
+        root.addChild(EntityModelPartNames.LEFT_LEG, ModelPartBuilder.create()
+                .uv(0, 25).cuboid(-2, 0, -2, 4, 3, 4)
+                .uv(21, 20).cuboid(-2, 3, -2, 4, 1, 5), ModelTransform.pivot(2, 0, 0));
+        return TexturedModelData.of(data, 64, 64);
      }
 
     @Override
     public ModelPart getPart() {
+       // rightArm.pitch = 0.2F + (float)Math.random();
+       // leftArm.pitch = 0.2F + (float)Math.random();
+       // nose.roll = (float)Math.random() - 0.5F;
         return root;
     }
 
     @Override
     public void setAngles(CopperGolemEntity entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
+        root.pivotY = 20;
+        root.yaw = (float)Math.PI;
+
         this.head.yaw = headYaw * 0.017453292F;
-        this.head.pitch = headPitch * 0.017453292F;
+        this.head.pitch = -headPitch * 0.017453292F;
+
         this.rightLeg.pitch = -1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
         this.leftLeg.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
-        this.rightLeg.yaw = 0.0F;
-        this.leftLeg.yaw = 0.0F;
+
+        this.rightArm.pitch = -1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+        this.leftArm.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+
+        this.nose.roll = MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
     }
 }

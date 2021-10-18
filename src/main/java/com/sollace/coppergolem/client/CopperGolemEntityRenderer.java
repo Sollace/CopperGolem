@@ -7,15 +7,14 @@ import net.minecraft.util.Identifier;
 import com.sollace.coppergolem.entity.CopperGolemEntity;
 
 public class CopperGolemEntityRenderer extends MobEntityRenderer<CopperGolemEntity, CopperGolemEntityModel> {
-    private static final Identifier TEXTURE = new Identifier("copper_golem", "textures/entity/copper_golem.png");
+    private static final Identifier TEXTURE = new Identifier("copper_golem", "textures/entity/copper_golem/copper_golem.png");
 
     public CopperGolemEntityRenderer(Context ctx) {
-        super(ctx, new CopperGolemEntityModel(CopperGolemEntityModel.getTexturedModelData().createModel()), 1);
+        super(ctx, new CopperGolemEntityModel(CopperGolemEntityModel.getTexturedModelData().createModel()), 0.3F);
     }
 
     @Override
     public Identifier getTexture(CopperGolemEntity entity) {
         return TEXTURE;
     }
-
 }
