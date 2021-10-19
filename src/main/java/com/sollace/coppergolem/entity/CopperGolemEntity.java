@@ -13,6 +13,7 @@ import net.minecraft.block.pattern.BlockPatternBuilder;
 import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
@@ -30,6 +31,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.block.BlockStatePredicate;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
@@ -194,6 +196,7 @@ public class CopperGolemEntity extends GolemEntity {
         }
     }
 
+    @Override
     protected ActionResult interactMob(PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
         if (stack.isIn(FabricToolTags.AXES) && getOxidation() >= 100) {
@@ -207,6 +210,15 @@ public class CopperGolemEntity extends GolemEntity {
         }
 
         return ActionResult.PASS;
+    }
+
+    @Override
+    public void onStruckByLightning(ServerWorld world, LightningEntity lightning) {
+        if (getOxidation() >= 100) {
+            setOxidation(100 * (getDegradationLevel().ordinal() - 1));
+            world.sendEntityStatus(this, SCRAPE_STATUS);
+            spinHead();
+        }
     }
 
     @Override
