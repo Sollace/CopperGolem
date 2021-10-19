@@ -141,6 +141,11 @@ public class CopperGolemEntity extends GolemEntity {
         return super.isImmobile() || getDegradationLevel() == OxidizationLevel.OXIDIZED;
     }
 
+    @Override
+    public boolean isCollidable() {
+        return inanimate;
+    }
+
     public void tick() {
         inanimate = isImmobile();
         if (inanimate) {
