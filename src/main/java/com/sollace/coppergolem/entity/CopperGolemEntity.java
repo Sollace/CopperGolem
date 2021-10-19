@@ -85,7 +85,7 @@ public class CopperGolemEntity extends GolemEntity {
     }
 
     public void setOxidation(int oxidation) {
-        dataTracker.set(OXIDATION, MathHelper.clamp(oxidation, 0, Oxidizable.OxidizationLevel.values().length * 100));
+        dataTracker.set(OXIDATION, MathHelper.clamp(oxidation, 0, (Oxidizable.OxidizationLevel.values().length - 1) * 100));
     }
 
     public int getOxidation() {
@@ -97,7 +97,7 @@ public class CopperGolemEntity extends GolemEntity {
 
         var levels = Oxidizable.OxidizationLevel.values();
 
-        return levels[Math.abs(oxidation) % levels.length];
+        return levels[MathHelper.clamp(oxidation, 0, levels.length - 1)];
     }
 
     public void setDegradationLevel(OxidizationLevel level) {
@@ -131,6 +131,43 @@ public class CopperGolemEntity extends GolemEntity {
     }
 
     @Override
+    protected boolean isImmobile() {
+        return super.isImmobile() || getDegradationLevel() == OxidizationLevel.OXIDIZED;
+    }
+
+    public void tick() {
+        inanimate = isImmobile();
+        if (inanimate) {
+            float pitch = this.getPitch();
+            float bodyYaw = this.bodyYaw;
+            float stepBobbingAmount = this.stepBobbingAmount;
+
+            float limbAngle = this.limbAngle;
+            float limbDistance = this.limbDistance;
+
+            float handSwingProgress = this.handSwingProgress;
+            float lastHandSwingProgress = this.lastHandSwingProgress;
+
+            super.tick();
+
+            this.setPitch(pitch);
+            this.prevPitch = pitch;
+            this.bodyYaw = bodyYaw;
+            this.prevBodyYaw = bodyYaw;
+            this.prevStepBobbingAmount = stepBobbingAmount;
+
+            this.limbAngle = limbAngle;
+            this.limbDistance = limbDistance;
+            this.lastLimbDistance = limbDistance;
+
+            this.handSwingProgress = handSwingProgress;
+            this.lastHandSwingProgress = lastHandSwingProgress;
+        } else {
+            super.tick();
+        }
+    }
+
+    @Override
     public void tickMovement() {
         super.tickMovement();
         tickHandSwing();
@@ -139,29 +176,32 @@ public class CopperGolemEntity extends GolemEntity {
             setOxidation(getOxidation() + 1);
         }
 
-        if (isWigglingNose()) {
-            dataTracker.set(WIGGLING_NOSE_TIME, dataTracker.get(WIGGLING_NOSE_TIME) - 1);
-        }
-        if (getHeadSpinTime() > 0) {
-            dataTracker.set(SPINNING_HEAD_TIME, dataTracker.get(SPINNING_HEAD_TIME) - 1);
+        if (!inanimate) {
+            if (isWigglingNose()) {
+                dataTracker.set(WIGGLING_NOSE_TIME, dataTracker.get(WIGGLING_NOSE_TIME) - 1);
+            }
+            if (getHeadSpinTime() > 0) {
+                dataTracker.set(SPINNING_HEAD_TIME, dataTracker.get(SPINNING_HEAD_TIME) - 1);
+            }
         }
 
         if (getRandom().nextInt(1200) == 0) {
             wiggleNose();
         }
 
-        if (getNavigation().isIdle() && getRandom().nextInt(600) == 0) {
+        if (getNavigation().isIdle() && getRandom().nextInt(1600) == 0) {
             spinHead();
         }
     }
 
     protected ActionResult interactMob(PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
-        if (stack.isIn(FabricToolTags.AXES) && getOxidation() >= 0) {
+        if (stack.isIn(FabricToolTags.AXES) && getOxidation() >= 100) {
             setOxidation(100 * (getDegradationLevel().ordinal() - 1));
             stack.damage(1, player, t -> t.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
             world.sendEntityStatus(this, SCRAPE_STATUS);
             playSound(SoundEvents.ITEM_AXE_SCRAPE, 1, 1);
+            spinHead();
 
             return ActionResult.SUCCESS;
         }

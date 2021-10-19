@@ -70,6 +70,11 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
 
     @Override
     public void setAngles(CopperGolemEntity entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
+
+        if (entity.inanimate) {
+            limbAngle = entity.limbAngle - entity.limbDistance;
+        }
+
         root.pivotY = 20;
         root.yaw = (float)Math.PI;
 
@@ -78,7 +83,7 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
         float maxRotation = 2 * (float)Math.PI;
 
         head.yaw = headYaw * 0.017453292F + MathHelper.lerp(headSpinTime, 0, maxRotation);
-        head.pitch = -headPitch * 0.017453292F;
+        head.pitch = headSpinTime > 0 ? 0 : -headPitch * 0.017453292F;
 
         rightLeg.pitch = -1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
         leftLeg.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
@@ -86,16 +91,17 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
         rightArm.pitch = -1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
         leftArm.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
 
-        body.pitch = MathHelper.lerp(entity.handSwingProgress, 0, -0.25F);
-        rightArm.pitch +=  MathHelper.lerp(entity.handSwingProgress, 0, 1.5F);
-        leftArm.pitch +=  MathHelper.lerp(entity.handSwingProgress, 0, 1.5F);
+        body.pitch = MathHelper.lerp(handSwingProgress, 0, -0.25F);
+        rightArm.pitch +=  MathHelper.lerp(handSwingProgress, 0, 1.5F);
+        leftArm.pitch +=  MathHelper.lerp(handSwingProgress, 0, 1.5F);
 
         rightArm.pitch = MathHelper.lerp(headSpinTime, rightArm.pitch, root.yaw);
         leftArm.pitch = MathHelper.lerp(headSpinTime, leftArm.pitch, root.yaw);
 
         if (!entity.isWigglingNose()) {
+            nose.roll = 0;
             nose.pitch = MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
-        } else {
+        } else if (!entity.inanimate) {
             nose.roll = (float)Math.random() - 0.5F;
         }
     }
