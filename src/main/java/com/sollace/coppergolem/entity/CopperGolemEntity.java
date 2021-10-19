@@ -40,7 +40,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEvents;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.sollace.coppergolem.GBlocks;
+import com.sollace.coppergolem.GSounds;
 import com.sollace.coppergolem.util.BlockStatePredicates;
 
 import java.util.function.Consumer;
@@ -182,8 +185,14 @@ public class CopperGolemEntity extends GolemEntity {
             if (isWigglingNose()) {
                 dataTracker.set(WIGGLING_NOSE_TIME, dataTracker.get(WIGGLING_NOSE_TIME) - 1);
             }
-            if (getHeadSpinTime() > 0) {
-                dataTracker.set(SPINNING_HEAD_TIME, dataTracker.get(SPINNING_HEAD_TIME) - 1);
+
+            int headSpinTime = getHeadSpinTime();
+
+            if (headSpinTime > 0) {
+                if (headSpinTime == 10) {
+                    playSound(GSounds.ENTITY_COPPER_GOLEM_WHIRL, getSoundVolume(), getSoundPitch());
+                }
+                dataTracker.set(SPINNING_HEAD_TIME, headSpinTime - 1);
             }
 
             if (getRandom().nextInt(1200) == 0) {
@@ -280,17 +289,22 @@ public class CopperGolemEntity extends GolemEntity {
 
     @Override
     protected void playStepSound(BlockPos pos, BlockState state) {
-        playSound(SoundEvents.BLOCK_COPPER_STEP, 1, 1);
+        playSound(GSounds.ENTITY_COPPER_GOLEM_STEP, 1, 1);
+    }
+
+    @Nullable
+    protected SoundEvent getAmbientSound() {
+       return null;
     }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
-        return SoundEvents.ENTITY_IRON_GOLEM_HURT;
+        return GSounds.ENTITY_COPPER_GOLEM_HURT;
     }
 
     @Override
     protected SoundEvent getDeathSound() {
-        return SoundEvents.ENTITY_IRON_GOLEM_DEATH;
+        return GSounds.ENTITY_COPPER_GOLEM_DEATH;
     }
 
     @Override
