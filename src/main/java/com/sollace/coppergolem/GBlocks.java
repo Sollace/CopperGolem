@@ -11,7 +11,7 @@ import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-import com.sollace.coppergolem.registry.OxidizableRegistry;
+import com.sollace.coppergolem.registry.MemoizeRegistries;
 
 public interface GBlocks {
     Block OXIDIZED_COPPER_BUTTON = register("oxidized_copper_button",
@@ -45,7 +45,11 @@ public interface GBlocks {
     }
 
     static void bootstrap() {
-        OxidizableRegistry.INSTANCE.register(COPPER_BUTTON, EXPOSED_COPPER_BUTTON, WEATHERED_COPPER_BUTTON, OXIDIZED_COPPER_BUTTON);
+        MemoizeRegistries.OXIDIZABLE.register(COPPER_BUTTON, EXPOSED_COPPER_BUTTON, WEATHERED_COPPER_BUTTON, OXIDIZED_COPPER_BUTTON);
+        MemoizeRegistries.HONEYCOMB.register(OXIDIZED_COPPER_BUTTON, WAXED_OXIDIZED_COPPER_BUTTON);
+        MemoizeRegistries.HONEYCOMB.register(WEATHERED_COPPER_BUTTON, WAXED_WEATHERED_COPPER_BUTTON);
+        MemoizeRegistries.HONEYCOMB.register(EXPOSED_COPPER_BUTTON, WAXED_EXPOSED_COPPER_BUTTON);
+        MemoizeRegistries.HONEYCOMB.register(COPPER_BUTTON, WAXED_COPPER_BUTTON);
     }
 
     public interface Tags {

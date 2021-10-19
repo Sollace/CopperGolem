@@ -1,7 +1,6 @@
 package com.sollace.coppergolem.registry;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.Oxidizable;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -9,31 +8,33 @@ import com.sollace.coppergolem.Main;
 
 import java.util.function.Supplier;
 
-public final class OxidizableRegistry {
-    public static final OxidizableRegistry INSTANCE = new OxidizableRegistry();
-
+public class MemoizeBackedRegistry {
     private final BiMap<Block, Block> entries = HashBiMap.create();
     private final BiMap<Block, Block> compiled = HashBiMap.create();
 
     private Supplier<BiMap<Block, Block>> vanilla;
 
-    private OxidizableRegistry() {}
+    private final Supplier<Supplier<BiMap<Block, Block>>> getter;
 
-    public void register(Block normal, Block exposed, Block weathered, Block oxidized) {
-        entries.put(normal, exposed);
-        entries.put(exposed, weathered);
-        entries.put(weathered, oxidized);
+    protected MemoizeBackedRegistry(Supplier<Supplier<BiMap<Block, Block>>> getter) {
+        this.getter = getter;
+    }
+
+    protected BiMap<Block, Block> getEntries() {
         compiled.clear();
         init();
+        return entries;
     }
 
     @SuppressWarnings("unchecked")
     private void init() {
+        compiled.clear();
+
         if (vanilla != null) {
             return;
         }
 
-        var replacing = Oxidizable.OXIDATION_LEVEL_INCREASES;
+        var replacing = getter.get();
 
         var c = replacing.getClass();
 
