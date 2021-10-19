@@ -35,6 +35,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.function.MaterialPredicate;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEvents;
 
@@ -84,7 +85,7 @@ public class CopperGolemEntity extends GolemEntity {
     }
 
     public void setOxidation(int oxidation) {
-        dataTracker.set(OXIDATION, Math.max(0, oxidation));
+        dataTracker.set(OXIDATION, MathHelper.clamp(oxidation, 0, Oxidizable.OxidizationLevel.values().length * 100));
     }
 
     public int getOxidation() {
