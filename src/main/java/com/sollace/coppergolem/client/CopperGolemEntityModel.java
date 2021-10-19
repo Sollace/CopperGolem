@@ -47,7 +47,7 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
                         .uv(36, 31).cuboid(-1, -1, -1.5F, 2, 2, 2)
                         .uv(0, 0).cuboid(-4, -5, -4, 8, 5, 7)
                         .uv(26, 16).cuboid(-1, -7, -1.5F, 2, 2, 2)
-                        .uv(0, 32).cuboid(-1.5F, -9, -2, 3, 2, 3), ModelTransform.pivot(0, -7, 0))
+                        .uv(0, 32).cuboid(-1.5F, -9, -2, 3, 3, 3), ModelTransform.pivot(0, -7, 0))
                         .addChild(EntityModelPartNames.NOSE, ModelPartBuilder.create()
                                 .uv(36, 26).cuboid(-1, -1, 2, 2, 3, 2), ModelTransform.NONE);
         root.addChild(EntityModelPartNames.RIGHT_ARM, ModelPartBuilder.create()
