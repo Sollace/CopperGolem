@@ -147,7 +147,6 @@ public class CopperGolemEntity extends GolemEntity {
             float limbDistance = this.limbDistance;
 
             float handSwingProgress = this.handSwingProgress;
-            float lastHandSwingProgress = this.lastHandSwingProgress;
 
             super.tick();
 
@@ -162,7 +161,7 @@ public class CopperGolemEntity extends GolemEntity {
             this.lastLimbDistance = limbDistance;
 
             this.handSwingProgress = handSwingProgress;
-            this.lastHandSwingProgress = lastHandSwingProgress;
+            this.lastHandSwingProgress = handSwingProgress;
         } else {
             super.tick();
         }
@@ -184,14 +183,14 @@ public class CopperGolemEntity extends GolemEntity {
             if (getHeadSpinTime() > 0) {
                 dataTracker.set(SPINNING_HEAD_TIME, dataTracker.get(SPINNING_HEAD_TIME) - 1);
             }
-        }
 
-        if (getRandom().nextInt(1200) == 0) {
-            wiggleNose();
-        }
+            if (getRandom().nextInt(1200) == 0) {
+                wiggleNose();
+            }
 
-        if (getNavigation().isIdle() && getRandom().nextInt(1600) == 0) {
-            spinHead();
+            if (getNavigation().isIdle() && getRandom().nextInt(1600) == 0) {
+                spinHead();
+            }
         }
     }
 
