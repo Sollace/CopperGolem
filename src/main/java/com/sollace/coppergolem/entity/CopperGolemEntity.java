@@ -27,6 +27,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
@@ -54,6 +55,8 @@ public class CopperGolemEntity extends GolemEntity {
     protected static final TrackedData<Integer> SPINNING_HEAD_TIME = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
     public static final byte SCRAPE_STATUS = 4;
+    public static final byte WAX_ON_STATUS = 5;
+    public static final byte WAX_OFF_STATUS = 6;
 
     private static final BlockPattern PATTERN = BlockPatternBuilder.start()
             .aisle("|", "#")
@@ -63,6 +66,8 @@ public class CopperGolemEntity extends GolemEntity {
             .where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicates.forTag(GBlocks.Tags.COPPER_GOLEM_MATERIALS)))
             .where('o', CachedBlockPosition.matchesBlockState(BlockStatePredicates.forTag(GBlocks.Tags.COPPER_BUTTONS)))
             .build();
+
+    protected boolean waxed;
 
     CopperGolemEntity(EntityType<CopperGolemEntity> type, World world) {
         super(type, world);
@@ -174,7 +179,7 @@ public class CopperGolemEntity extends GolemEntity {
         super.tickMovement();
         tickHandSwing();
 
-        if (random.nextFloat() < 0.05688889F) {
+        if (!waxed && random.nextFloat() < 0.05688889F) {
             setOxidation(getOxidation() + 1);
         }
 
@@ -199,12 +204,31 @@ public class CopperGolemEntity extends GolemEntity {
     @Override
     protected ActionResult interactMob(PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
-        if (stack.isIn(FabricToolTags.AXES) && getOxidation() >= 100) {
-            setOxidation(100 * (getDegradationLevel().ordinal() - 1));
-            stack.damage(1, player, t -> t.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
-            world.sendEntityStatus(this, SCRAPE_STATUS);
-            playSound(SoundEvents.ITEM_AXE_SCRAPE, 1, 1);
-            spinHead();
+        if (stack.isIn(FabricToolTags.AXES)) {
+            if (waxed) {
+                waxed = false;
+                stack.damage(1, player, t -> t.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
+                world.sendEntityStatus(this, WAX_OFF_STATUS);
+                playSound(SoundEvents.ITEM_AXE_WAX_OFF, 1, 1);
+
+                return ActionResult.SUCCESS;
+            } else if (getOxidation() >= 100) {
+                setOxidation(100 * (getDegradationLevel().ordinal() - 1));
+                stack.damage(1, player, t -> t.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
+                world.sendEntityStatus(this, SCRAPE_STATUS);
+                playSound(SoundEvents.ITEM_AXE_SCRAPE, 1, 1);
+                spinHead();
+
+                return ActionResult.SUCCESS;
+            }
+        } else if (stack.isOf(Items.HONEYCOMB) && !waxed) {
+            waxed = true;
+            world.sendEntityStatus(this, WAX_ON_STATUS);
+            playSound(SoundEvents.ITEM_HONEYCOMB_WAX_ON, 1, 1);
+
+            if (!player.getAbilities().creativeMode) {
+                stack.decrement(1);
+            }
 
             return ActionResult.SUCCESS;
         }
@@ -225,18 +249,24 @@ public class CopperGolemEntity extends GolemEntity {
     public void writeCustomDataToNbt(NbtCompound nbt) {
        super.writeCustomDataToNbt(nbt);
        nbt.putInt("oxidation", getOxidation());
+       nbt.putBoolean("waxed", waxed);
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
        super.readCustomDataFromNbt(nbt);
        setOxidation(nbt.getInt("oxidation"));
+       waxed = nbt.getBoolean("waxed");
     }
 
     @Override
     public void handleStatus(byte status) {
         if (status == SCRAPE_STATUS) {
             produceParticles(ParticleTypes.SCRAPE);
+        } else if (status == WAX_ON_STATUS) {
+            produceParticles(ParticleTypes.WAX_ON);
+        } else if (status == WAX_OFF_STATUS) {
+            produceParticles(ParticleTypes.WAX_OFF);
         } else {
            super.handleStatus(status);
         }
