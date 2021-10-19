@@ -41,7 +41,7 @@ public class PressButtonGoal extends Goal {
         this.entity = entity;
         this.maxDistance = maxDistance;
         this.maxIdleTicks = maxIdleTicks;
-        setControls(EnumSet.of(Goal.Control.MOVE));
+        setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
     }
 
     @Override
@@ -72,7 +72,7 @@ public class PressButtonGoal extends Goal {
 
         targetButton = pickAnyButton(pos -> {
            Path path = entity.getNavigation().findPathTo(pos, 1);
-           if (path == null || path.getLength() == 1) {
+           if (path == null || path.getLength() == 1 || recentlyVisited(pos)) {
                return false;
            }
 
@@ -105,11 +105,11 @@ public class PressButtonGoal extends Goal {
 
         targetButton.ifPresent(pos -> {
             targetButton.map(this::toState).filter(this::canPress).ifPresentOrElse(state -> {
-                double dist = entity.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ());
 
                 entity.getNavigation().setSpeed(getWalkSpeedTo(pos));
+                entity.getLookControl().lookAt(pos.getX(), pos.getY(), pos.getZ());
 
-                if (dist < 1.5) {
+                if (entity.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) < 0.5) {
                     entity.swingHand(Hand.MAIN_HAND);
 
                     ((AbstractButtonBlock)state.getBlock()).powerOn(state, entity.getEntityWorld(), pos);
@@ -144,7 +144,7 @@ public class PressButtonGoal extends Goal {
             searchArea(2).forEach(knownButtonPositions::add);
         }
 
-        return knownButtonPositions.stream().filter(this::notRecentlyVisited);
+        return knownButtonPositions.stream();
     }
 
     private Stream<BlockPos> searchArea(int range) {
@@ -153,9 +153,13 @@ public class PressButtonGoal extends Goal {
                 .map(BlockPos::toImmutable);
     }
 
-    private boolean notRecentlyVisited(BlockPos pos) {
+    private boolean recentlyVisited(BlockPos pos) {
         visitedButtons.values().removeIf(l -> l < entity.age);
-        return visitedButtons.computeIfAbsent(pos, p -> (long)entity.age + 10) > entity.age;
+
+        boolean visited = visitedButtons.containsKey(pos);
+        long visitTime = visitedButtons.computeIfAbsent(pos, p -> (long)entity.age + 10 + entity.getRandom().nextInt(130));
+
+        return visited && visitTime >= entity.age;
     }
 
     private BlockState toState(BlockPos pos) {
