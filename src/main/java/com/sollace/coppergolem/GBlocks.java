@@ -1,11 +1,13 @@
 package com.sollace.coppergolem;
 
+import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.Material;
 import net.minecraft.block.Oxidizable;
 import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -44,5 +46,14 @@ public interface GBlocks {
 
     static void bootstrap() {
         OxidizableRegistry.INSTANCE.register(COPPER_BUTTON, EXPOSED_COPPER_BUTTON, WEATHERED_COPPER_BUTTON, OXIDIZED_COPPER_BUTTON);
+    }
+
+    public interface Tags {
+        Tag<Block> COPPER_GOLEM_MATERIALS = register("copper_golem_materials");
+        Tag<Block> COPPER_BUTTONS = register("copper_buttons");
+
+        static Tag<Block> register(String name) {
+            return TagRegistry.block(new Identifier("copper_golem", name));
+        }
     }
 }

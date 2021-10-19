@@ -7,6 +7,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 import net.minecraft.block.Oxidizable;
 import net.minecraft.block.Oxidizable.OxidizationLevel;
+import net.minecraft.block.WallMountedBlock;
 import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.block.pattern.BlockPatternBuilder;
 import net.minecraft.block.pattern.CachedBlockPosition;
@@ -39,8 +40,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEvents;
 
-import com.sollace.coppergolem.CopperButtonBlock;
 import com.sollace.coppergolem.GBlocks;
+import com.sollace.coppergolem.util.BlockStatePredicates;
 
 import java.util.function.Consumer;
 
@@ -57,8 +58,8 @@ public class CopperGolemEntity extends GolemEntity {
             .aisle("~", "o")
             .where('~', CachedBlockPosition.matchesBlockState(MaterialPredicate.create(Material.AIR)))
             .where('|', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(Blocks.LIGHTNING_ROD)))
-            .where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(Blocks.COPPER_BLOCK)))
-            .where('o', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(GBlocks.COPPER_BUTTON)))
+            .where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicates.forTag(GBlocks.Tags.COPPER_GOLEM_MATERIALS)))
+            .where('o', CachedBlockPosition.matchesBlockState(BlockStatePredicates.forTag(GBlocks.Tags.COPPER_BUTTONS)))
             .build();
 
     CopperGolemEntity(EntityType<CopperGolemEntity> type, World world) {
@@ -267,10 +268,16 @@ public class CopperGolemEntity extends GolemEntity {
             return false;
         }
 
+        OxidizationLevel[] oxidation = new OxidizationLevel[] { OxidizationLevel.UNAFFECTED };
+
         iterateAround(result, position -> {
-            if (position.getBlockState().getBlock() instanceof CopperButtonBlock) {
+            if (position.getBlockState().getBlock() instanceof WallMountedBlock) {
                 world.setBlockState(position.getBlockPos(), Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
                 world.syncWorldEvent(WorldEvents.BLOCK_BROKEN, position.getBlockPos(), Block.getRawIdFromState(position.getBlockState()));
+            }
+
+            if (position.getBlockState().isIn(GBlocks.Tags.COPPER_GOLEM_MATERIALS) && position.getBlockState().getBlock() instanceof Oxidizable) {
+                oxidation[0] = ((Oxidizable)position.getBlockState().getBlock()).getDegradationLevel();
             }
         });
 
@@ -284,7 +291,7 @@ public class CopperGolemEntity extends GolemEntity {
         golem.refreshPositionAndAngles(center.getX() + 0.5, center.getY() + 0.1, center.getZ() + 0.5, result.getForwards().asRotation(), 0);
         golem.bodyYaw = result.getForwards().asRotation();
         golem.headYaw = result.getForwards().asRotation();
-
+        golem.setDegradationLevel(oxidation[0]);
         world.spawnEntity(golem);
 
         golem.spinHead();
