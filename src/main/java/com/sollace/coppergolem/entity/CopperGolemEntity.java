@@ -14,12 +14,9 @@ import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LightningEntity;
-import net.minecraft.entity.ai.goal.EscapeDangerGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.entity.ai.goal.WanderAroundPointOfInterestGoal;
-import net.minecraft.entity.ai.goal.WanderNearTargetGoal;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -49,7 +46,6 @@ import com.sollace.coppergolem.util.BlockStatePredicates;
 import java.util.function.Consumer;
 
 public class CopperGolemEntity extends GolemEntity {
-
     protected static final TrackedData<Integer> OXIDATION = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.INTEGER);
     protected static final TrackedData<Integer> WIGGLING_NOSE_TIME = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.INTEGER);
     protected static final TrackedData<Integer> SPINNING_HEAD_TIME = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -76,9 +72,8 @@ public class CopperGolemEntity extends GolemEntity {
     @Override
     protected void initGoals() {
         goalSelector.add(1, new MeleeAttackGoal(this, 1, true));
-        goalSelector.add(1, new EscapeDangerGoal(this, 1));
-        goalSelector.add(2, new WanderNearTargetGoal(this, 0.9, 32));
-        goalSelector.add(2, new WanderAroundPointOfInterestGoal(this, 0.6, false));
+        goalSelector.add(1, new VariantSpeedEscapeDangerGoal(this));
+        goalSelector.add(2, new VariantSpeedWanderAroundFarGoal(this));
         goalSelector.add(7, new LookAtEntityGoal(this, PlayerEntity.class, 6));
         goalSelector.add(8, new LookAroundGoal(this));
         targetSelector.add(1, new PressButtonGoal(this, 14, 30));
