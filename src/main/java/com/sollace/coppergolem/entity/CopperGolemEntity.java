@@ -342,9 +342,12 @@ public class CopperGolemEntity extends GolemEntity {
         golem.bodyYaw = result.getForwards().asRotation();
         golem.headYaw = result.getForwards().asRotation();
         golem.setDegradationLevel(oxidation[0]);
+
         world.spawnEntity(golem);
 
-        golem.spinHead();
+        if (oxidation[0] != OxidizationLevel.OXIDIZED || golem.getRandom().nextBoolean()) {
+            golem.spinHead();
+        }
 
         iterateAround(result, position -> {
             world.updateNeighbors(position.getBlockPos(), Blocks.AIR);
