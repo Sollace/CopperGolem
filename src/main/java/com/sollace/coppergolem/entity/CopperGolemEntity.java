@@ -331,6 +331,12 @@ public class CopperGolemEntity extends GolemEntity {
        super.writeCustomDataToNbt(nbt);
        nbt.putInt("oxidation", getOxidation());
        nbt.putBoolean("waxed", waxed);
+
+       NbtCompound modules = new NbtCompound();
+       finders.forEach((block, module) -> {
+           modules.put(block.toString(), module.toNbt());
+       });
+       nbt.put("interactionMemories", modules);
     }
 
     @Override
@@ -338,6 +344,15 @@ public class CopperGolemEntity extends GolemEntity {
        super.readCustomDataFromNbt(nbt);
        setOxidation(nbt.getInt("oxidation"));
        waxed = nbt.getBoolean("waxed");
+
+       finders.clear();
+       NbtCompound modules = nbt.getCompound("interactionMemories");
+       modules.getKeys().forEach(block -> {
+          Identifier id = Identifier.tryParse(block);
+          if (id != null) {
+              finders.put(id, BlockInteraction.fromNbt(this, modules.getCompound(block)));
+          }
+       });
     }
 
     @Override

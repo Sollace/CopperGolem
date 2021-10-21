@@ -1,6 +1,10 @@
 package com.sollace.coppergolem.entity.ai;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtLong;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
@@ -28,7 +32,7 @@ public abstract class PositionFinder {
 
     private int scanCounter = MAX_SCAN_TICKS;
 
-    private final int maxScanDistance;
+    private int maxScanDistance;
 
     public PositionFinder(CopperGolemEntity entity, int maxDistance) {
         this.entity = entity;
@@ -82,5 +86,22 @@ public abstract class PositionFinder {
 
     private boolean isExposed(BlockPos pos) {
         return Arrays.stream(DIRECTIONS).map(pos::offset).map(this::toState).anyMatch(BlockState::isAir);
+    }
+
+    public void readNbt(NbtCompound tag) {
+        knownPositions.clear();
+        tag.getList("knownPositions", NbtElement.LONG_TYPE).stream().map(l -> BlockPos.fromLong(((NbtLong)l).longValue())).forEach(knownPositions::add);;
+        maxScanDistance = tag.getInt("maxScanDistance");
+        scanCounter = tag.getInt("scanCounter");
+        minWalkDistance = tag.getInt("minWalkDistance");
+    }
+
+    public void writeNbt(NbtCompound tag) {
+        NbtList positions = new NbtList();
+        knownPositions.stream().map(BlockPos::asLong).map(NbtLong::of).forEach(positions::add);
+        tag.put("knownPositions", positions);
+        tag.putInt("maxScanDistance", maxScanDistance);
+        tag.putInt("scanCounter", scanCounter);
+        tag.putInt("minWalkDistance", minWalkDistance);
     }
 }
