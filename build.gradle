@@ -54,7 +54,6 @@ processResources {
 
     filesMatching("fabric.mod.json") {
         expand "version": project.version.toString()
-        expand "description": project.description
     }
 
     from 'LICENSE'

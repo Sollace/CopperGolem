@@ -3,7 +3,7 @@
   "id": "copper_golem",
   "version": "${version}",
   "name": "Copper Golem",
-  "description": "${description}",
+  "description": "Adds the copper golem from the 2021 Minecon Mob Vote",
   "authors": [
     "Sollace"
   ],
