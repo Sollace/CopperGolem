@@ -1,4 +1,4 @@
-package com.sollace.coppergolem.entity;
+package com.sollace.coppergolem.entity.ai;
 
 import net.minecraft.entity.ai.goal.WanderAroundFarGoal;
 import net.minecraft.entity.mob.PathAwareEntity;

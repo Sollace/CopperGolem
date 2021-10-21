@@ -1,9 +1,11 @@
 package com.sollace.coppergolem;
 
+import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -23,4 +25,12 @@ public interface GItems {
     }
 
     static void bootstrap() {}
+
+    public interface Tags {
+        Tag<Item> COPPER_GOLEM_CAN_PICK_UP = register("copper_golem_can_pick_up");
+
+        static Tag<Item> register(String name) {
+            return TagRegistry.item(new Identifier("copper_golem", name));
+        }
+    }
 }

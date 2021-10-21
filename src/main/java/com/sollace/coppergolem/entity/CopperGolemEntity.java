@@ -13,6 +13,7 @@ import net.minecraft.block.pattern.BlockPatternBuilder;
 import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
@@ -34,18 +35,27 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.function.MaterialPredicate;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEvents;
 
 import org.jetbrains.annotations.Nullable;
 
 import com.sollace.coppergolem.GBlocks;
+import com.sollace.coppergolem.GItems;
 import com.sollace.coppergolem.GSounds;
+import com.sollace.coppergolem.entity.ai.BlockInteraction;
+import com.sollace.coppergolem.entity.ai.PressButtonGoal;
+import com.sollace.coppergolem.entity.ai.VariantSpeedEscapeDangerGoal;
+import com.sollace.coppergolem.entity.ai.VariantSpeedWanderAroundFarGoal;
 import com.sollace.coppergolem.util.BlockStatePredicates;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class CopperGolemEntity extends GolemEntity {
@@ -68,6 +78,8 @@ public class CopperGolemEntity extends GolemEntity {
 
     protected boolean waxed;
 
+    private final Map<Identifier, BlockInteraction> finders = new HashMap<>();
+
     CopperGolemEntity(EntityType<CopperGolemEntity> type, World world) {
         super(type, world);
     }
@@ -88,6 +100,50 @@ public class CopperGolemEntity extends GolemEntity {
         dataTracker.startTracking(OXIDATION, 0);
         dataTracker.startTracking(WIGGLING_NOSE_TIME, 0);
         dataTracker.startTracking(SPINNING_HEAD_TIME, 0);
+    }
+
+    public BlockInteraction getFinder(int maxDistance) {
+        return finders.computeIfAbsent(Registry.ITEM.getId(getStackInHand(Hand.MAIN_HAND).getItem()), id -> {
+            return BlockInteraction.create(this, maxDistance);
+        });
+    }
+
+    @Override
+    public boolean canPickupItem(ItemStack stack) {
+        ItemStack current = this.getStackInHand(Hand.MAIN_HAND);
+
+        if (!current.isEmpty() && ItemStack.canCombine(current, stack)) {
+            return true;
+        }
+
+        return GItems.Tags.COPPER_GOLEM_CAN_PICK_UP.contains(stack.getItem());
+    }
+
+    @Override
+    protected void loot(ItemEntity item) {
+
+        ItemStack stack = item.getStack();
+
+        if (canPickupItem(stack)) {
+            ItemStack current = getEquippedStack(EquipmentSlot.MAINHAND);
+
+            int canTake = current.getMaxCount() - current.getCount();
+
+            if (canTake > 0) {
+                if (canTake >= stack.getCount()) {
+                    triggerItemPickedUpByEntityCriteria(item);
+                    equipStack(EquipmentSlot.MAINHAND, stack);
+                    handDropChances[EquipmentSlot.MAINHAND.getEntitySlotId()] = 2;
+                    sendPickup(item, stack.getCount());
+                    item.discard();
+                } else {
+                    item.setStack(stack.split(stack.getCount() - canTake));
+                    current.increment(canTake);
+                    equipStack(EquipmentSlot.MAINHAND, stack);
+                    handDropChances[EquipmentSlot.MAINHAND.getEntitySlotId()] = 2;
+                }
+            }
+        }
     }
 
     public void setOxidation(int oxidation) {
@@ -116,6 +172,11 @@ public class CopperGolemEntity extends GolemEntity {
 
     public void wiggleNose() {
         dataTracker.set(WIGGLING_NOSE_TIME, 10);
+    }
+
+    public void expressDissappointment() {
+        wiggleNose();
+        playSound(SoundEvents.ENTITY_VILLAGER_NO, getSoundVolume(), getSoundPitch());
     }
 
     public int getHeadSpinTime() {
@@ -179,6 +240,7 @@ public class CopperGolemEntity extends GolemEntity {
 
     @Override
     public void tickMovement() {
+        setCanPickUpLoot(true);
         super.tickMovement();
         tickHandSwing();
 
@@ -240,6 +302,16 @@ public class CopperGolemEntity extends GolemEntity {
             }
 
             return ActionResult.SUCCESS;
+        } else {
+            ItemStack heldStack = getStackInHand(Hand.MAIN_HAND);
+            if (heldStack.isEmpty() || ItemStack.canCombine(heldStack, stack)) {
+                ItemStack newStack = stack.split(1);
+                newStack.increment(heldStack.getCount());
+                equipStack(EquipmentSlot.MAINHAND, stack);
+                handDropChances[EquipmentSlot.MAINHAND.getEntitySlotId()] = 2;
+
+                return ActionResult.SUCCESS;
+            }
         }
 
         return ActionResult.PASS;

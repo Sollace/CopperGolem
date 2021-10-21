@@ -8,6 +8,7 @@ import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
 import net.minecraft.client.render.entity.model.EntityModelPartNames;
 import net.minecraft.client.render.entity.model.SinglePartEntityModel;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 
 import com.sollace.coppergolem.entity.CopperGolemEntity;
@@ -20,8 +21,8 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
     private final ModelPart head;
     private final ModelPart nose;
 
-    private final ModelPart rightArm;
-    private final ModelPart leftArm;
+    public final ModelPart rightArm;
+    public final ModelPart leftArm;
 
     private final ModelPart rightLeg;
     private final ModelPart leftLeg;
@@ -51,9 +52,9 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
                         .addChild(EntityModelPartNames.NOSE, ModelPartBuilder.create()
                                 .uv(36, 26).cuboid(-1, -1, 2, 2, 3, 2), ModelTransform.NONE);
         root.addChild(EntityModelPartNames.RIGHT_ARM, ModelPartBuilder.create()
-                .uv(16, 26).cuboid(0, -2, -1.5F, 2, 9, 3), ModelTransform.pivot(-6, -6, -0.5F));
+                .uv(16, 26).cuboid(0, -1, -1.5F, 2, 9, 3), ModelTransform.pivot(-6, -6, -0.5F));
         root.addChild(EntityModelPartNames.LEFT_ARM, ModelPartBuilder.create()
-                .uv(26, 26).cuboid(0, -2, -1.5F, 2, 9, 3), ModelTransform.pivot(4, -6, -0.5F));
+                .uv(26, 26).cuboid(0, -1, -1.5F, 2, 9, 3), ModelTransform.pivot(4, -6, -0.5F));
         root.addChild(EntityModelPartNames.RIGHT_LEG, ModelPartBuilder.create()
                 .uv(26, 9).cuboid(-2, 0, -3, 4, 3, 4)
                 .uv(23, 0).cuboid(-2, 3, -3, 4, 1, 5), ModelTransform.pivot(-2, 0, 0));
@@ -92,11 +93,15 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
         leftArm.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
 
         body.pitch = MathHelper.lerp(handSwingProgress, 0, -0.25F);
-        rightArm.pitch +=  MathHelper.lerp(handSwingProgress, 0, 1.5F);
-        leftArm.pitch +=  MathHelper.lerp(handSwingProgress, 0, 1.5F);
 
-        rightArm.pitch = MathHelper.lerp(headSpinTime, rightArm.pitch, root.yaw);
-        leftArm.pitch = MathHelper.lerp(headSpinTime, leftArm.pitch, root.yaw);
+        if (!entity.getStackInHand(Hand.MAIN_HAND).isEmpty()) {
+            leftArm.pitch = 0.5F + MathHelper.lerp(handSwingProgress, 0, 1.5F);
+        } else {
+
+            rightArm.pitch +=  MathHelper.lerp(handSwingProgress, 0, 1.5F);
+            leftArm.pitch +=  MathHelper.lerp(handSwingProgress, 0, 1.5F);
+        }
+
 
         if (!entity.isWigglingNose()) {
             nose.roll = 0;
