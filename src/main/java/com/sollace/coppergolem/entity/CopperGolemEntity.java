@@ -27,6 +27,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.block.BlockStatePredicate;
@@ -56,6 +57,7 @@ import com.sollace.coppergolem.util.BlockStatePredicates;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class CopperGolemEntity extends GolemEntity {
@@ -63,6 +65,7 @@ public class CopperGolemEntity extends GolemEntity {
     protected static final TrackedData<Integer> WIGGLING_NOSE_TIME = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.INTEGER);
     protected static final TrackedData<Integer> SPINNING_HEAD_TIME = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.INTEGER);
     protected static final TrackedData<Byte> REACH_DIRECTION = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.BYTE);
+    protected static final TrackedData<NbtCompound> POSING = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.TAG_COMPOUND);
 
     public static final byte REACHING_NONE = 0;
     public static final byte REACHING_UP = 1;
@@ -108,6 +111,7 @@ public class CopperGolemEntity extends GolemEntity {
         dataTracker.startTracking(WIGGLING_NOSE_TIME, 0);
         dataTracker.startTracking(SPINNING_HEAD_TIME, 0);
         dataTracker.startTracking(REACH_DIRECTION, REACHING_NONE);
+        dataTracker.startTracking(POSING, new NbtCompound());
     }
 
     public BlockInteraction getFinder(int maxDistance) {
@@ -227,31 +231,20 @@ public class CopperGolemEntity extends GolemEntity {
     @Override
     public void tick() {
         inanimate = isImmobile();
+
         if (inanimate) {
-            float pitch = this.getPitch();
-            float bodyYaw = this.bodyYaw;
-            float stepBobbingAmount = this.stepBobbingAmount;
-
-            float limbAngle = this.limbAngle;
-            float limbDistance = this.limbDistance;
-
-            float handSwingProgress = this.handSwingProgress;
+            if (!getPosing().isPresent() && !world.isClient) {
+                setPosing(Optional.of(storeAngles()));
+            }
 
             super.tick();
 
-            this.setPitch(pitch);
-            this.prevPitch = pitch;
-            this.bodyYaw = bodyYaw;
-            this.prevBodyYaw = bodyYaw;
-            this.prevStepBobbingAmount = stepBobbingAmount;
-
-            this.limbAngle = limbAngle;
-            this.limbDistance = limbDistance;
-            this.lastLimbDistance = limbDistance;
-
-            this.handSwingProgress = handSwingProgress;
-            this.lastHandSwingProgress = handSwingProgress;
+            getPosing().ifPresent(this::loadAngles);
         } else {
+            if (getPosing().isPresent() && !world.isClient) {
+                setPosing(Optional.empty());
+            }
+
             if (reachingTicks > 0) {
                 if (--reachingTicks == 0) {
                     setReachDirection(REACHING_NONE);
@@ -269,7 +262,7 @@ public class CopperGolemEntity extends GolemEntity {
         tickHandSwing();
 
         if (!waxed && random.nextFloat() < 0.05688889F) {
-            setOxidation(getOxidation() + 1);
+            setOxidation(getOxidation() + 100);
         }
 
         if (!inanimate) {
@@ -350,6 +343,37 @@ public class CopperGolemEntity extends GolemEntity {
         }
     }
 
+    public void setPosing(Optional<NbtCompound> posing) {
+        NbtCompound tag = new NbtCompound();
+        posing.ifPresent(t -> tag.put("posing", t));
+        dataTracker.set(POSING, tag);
+    }
+
+    public Optional<NbtCompound> getPosing() {
+        NbtCompound tag = dataTracker.get(POSING);
+        return tag.contains("posing", NbtElement.COMPOUND_TYPE) ? Optional.of(tag.getCompound("posing")) : Optional.empty();
+    }
+
+    public void loadAngles(NbtCompound tag) {
+        setPitch(tag.getFloat("pitch"));
+        bodyYaw = tag.getFloat("bodyYaw");
+        stepBobbingAmount = tag.getFloat("stepBobbingAmount");
+        limbAngle = tag.getFloat("limbAngle");
+        limbDistance = tag.getFloat("limbDistance");
+        handSwingProgress = tag.getFloat("handSwingProgress");
+    }
+
+    public NbtCompound storeAngles() {
+        NbtCompound tag = new NbtCompound();
+        tag.putFloat("pitch", getPitch());
+        tag.putFloat("bodyYaw", bodyYaw);
+        tag.putFloat("stepBobbingAmount", stepBobbingAmount);
+        tag.putFloat("limbAngle", limbAngle);
+        tag.putFloat("limbDistance", limbDistance);
+        tag.putFloat("handSwingProgress", handSwingProgress);
+        return tag;
+    }
+
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
        super.writeCustomDataToNbt(nbt);
@@ -361,6 +385,7 @@ public class CopperGolemEntity extends GolemEntity {
            modules.put(block.toString(), module.toNbt());
        });
        nbt.put("interactionMemories", modules);
+       getPosing().ifPresent(posing -> nbt.put("posing", posing));
     }
 
     @Override
@@ -377,6 +402,9 @@ public class CopperGolemEntity extends GolemEntity {
               finders.put(id, BlockInteraction.fromNbt(this, modules.getCompound(block)));
           }
        });
+       setPosing(nbt.contains("posing") ? Optional.of(nbt.getCompound("posing")) : Optional.empty());
+
+       getPosing().ifPresent(this::loadAngles);
     }
 
     @Override
@@ -481,5 +509,4 @@ public class CopperGolemEntity extends GolemEntity {
             }
         }
     }
-
 }
