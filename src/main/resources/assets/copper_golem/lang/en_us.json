@@ -11,7 +11,7 @@
 
    "entity.copper_golem.copper_golem": "Copper Golem",
 
-   "subtitles.entity.copper_golem.step": "Copper Golem steps",
+   "subtitles.entity.copper_golem.step": "Footsteps",
    "subtitles.entity.copper_golem.ambient": "Copper Golem grunts",
    "subtitles.entity.copper_golem.hurt": "Copper Golem hurts",
    "subtitles.entity.copper_golem.no": "Copper Golem harrumphs",
