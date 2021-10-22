@@ -86,11 +86,22 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
         head.yaw = headYaw * 0.017453292F + MathHelper.lerp(headSpinTime, 0, maxRotation);
         head.pitch = headSpinTime > 0 ? 0 : -headPitch * 0.017453292F;
 
-        rightLeg.pitch = -1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
-        leftLeg.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+        if (riding) {
+            rightLeg.pitch = 1.5F;
+            rightLeg.yaw = -0.5F;
+            leftLeg.pitch = 1.5F;
+            leftLeg.yaw = 0.5F;
 
-        rightArm.pitch = -1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
-        leftArm.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+            rightArm.pitch = 1.25F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+            leftArm.pitch = 1.25F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+        } else {
+            rightLeg.pitch = -1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+            leftLeg.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+
+            rightArm.pitch = -1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+            leftArm.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+        }
+
 
         body.pitch = MathHelper.lerp(handSwingProgress, 0, -0.25F);
 
@@ -101,7 +112,6 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
             rightArm.pitch +=  MathHelper.lerp(handSwingProgress, 0, 1.5F);
             leftArm.pitch +=  MathHelper.lerp(handSwingProgress, 0, 1.5F);
         }
-
 
         if (!entity.isWigglingNose()) {
             nose.roll = 0;
