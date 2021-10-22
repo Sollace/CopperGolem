@@ -15,6 +15,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LightningEntity;
+import net.minecraft.entity.ai.goal.FleeEntityGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.ai.goal.MeleeAttackGoal;
@@ -22,6 +23,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -96,12 +98,12 @@ public class CopperGolemEntity extends GolemEntity {
 
     @Override
     protected void initGoals() {
-        goalSelector.add(1, new MeleeAttackGoal(this, 1, true));
-        goalSelector.add(1, new VariantSpeedEscapeDangerGoal(this));
-        goalSelector.add(2, new VariantSpeedWanderAroundFarGoal(this));
+        goalSelector.add(1, new FleeEntityGoal<>(this, CatEntity.class, 10, 0.5, 1));
+        goalSelector.add(2, new VariantSpeedEscapeDangerGoal(this));
+        goalSelector.add(2, new PressButtonGoal(this, 14, 30));
+        goalSelector.add(3, new VariantSpeedWanderAroundFarGoal(this));
         goalSelector.add(7, new LookAtEntityGoal(this, PlayerEntity.class, 6));
         goalSelector.add(8, new LookAroundGoal(this));
-        targetSelector.add(1, new PressButtonGoal(this, 14, 30));
     }
 
     @Override
