@@ -262,7 +262,7 @@ public class CopperGolemEntity extends GolemEntity {
         tickHandSwing();
 
         if (!waxed && random.nextFloat() < 0.05688889F) {
-            setOxidation(getOxidation() + 100);
+            setOxidation(getOxidation() + 1);
         }
 
         if (!inanimate) {
