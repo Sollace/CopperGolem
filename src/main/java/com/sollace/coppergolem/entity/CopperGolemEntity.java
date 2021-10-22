@@ -197,7 +197,7 @@ public class CopperGolemEntity extends GolemEntity {
 
     public void expressDissappointment() {
         wiggleNose();
-        playSound(SoundEvents.ENTITY_VILLAGER_NO, getSoundVolume(), getSoundPitch());
+        playSound(GSounds.ENTITY_COPPER_GOLEM_NO, getSoundVolume(), getSoundPitch());
     }
 
     public int getHeadSpinTime() {

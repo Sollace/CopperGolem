@@ -1,0 +1,50 @@
+{
+  "entity.copper_golem.step": {
+    "sounds": [
+      "block/copper/step1",
+      "block/copper/step2",
+      "block/copper/step3",
+      "block/copper/step4",
+      "block/copper/step5",
+      "block/copper/step6"
+    ],
+    "subtitle": "subtitles.entity.copper_golem.step"
+  },
+  "entity.copper_golem.ambient": {
+    "sounds": [
+      "mob/villager/idle1",
+      "mob/villager/idle2",
+      "mob/villager/idle3"
+    ],
+    "subtitle": "subtitles.entity.copper_golem.ambient"
+  },
+  "entity.copper_golem.hurt": {
+    "sounds": [
+      "mob/irongolem/hit1",
+      "mob/irongolem/hit2",
+      "mob/irongolem/hit3",
+      "mob/irongolem/hit4"
+    ],
+    "subtitle": "subtitles.entity.copper_golem.hurt"
+  },
+  "entity.copper_golem.death": {
+    "sounds": [
+      "mob/irongolem/death"
+    ],
+    "subtitle": "subtitles.entity.copper_golem.death"
+  },
+  "entity.copper_golem.no": {
+    "sounds": [
+      "mob/villager/no1",
+      "mob/villager/no2",
+      "mob/villager/no3"
+    ],
+    "subtitle": "subtitles.entity.copper_golem.no"
+  },
+  "entity.copper_golem.whirl": {
+    "sounds": [
+      "copper_golem:gear/crank0"
+    ],
+    "subtitle": "subtitles.entity.copper_golem.whirl"
+  }
+}

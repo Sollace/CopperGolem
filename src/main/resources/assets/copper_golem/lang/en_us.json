@@ -9,5 +9,12 @@
    "block.copper_golem.waxed_exposed_copper_button": "Waxed Exposed Copper Button",
    "block.copper_golem.waxed_copper_button": "Waxed Copper Button",
 
-   "entity.copper_golem.copper_golem": "Copper Golem"
+   "entity.copper_golem.copper_golem": "Copper Golem",
+
+   "subtitles.entity.copper_golem.step": "Copper Golem steps",
+   "subtitles.entity.copper_golem.ambient": "Copper Golem grunts",
+   "subtitles.entity.copper_golem.hurt": "Copper Golem hurts",
+   "subtitles.entity.copper_golem.no": "Copper Golem harrumphs",
+   "subtitles.entity.copper_golem.death": "Copper Golem dies",
+   "subtitles.entity.copper_golem.whirl": "Gear whirls"
 }

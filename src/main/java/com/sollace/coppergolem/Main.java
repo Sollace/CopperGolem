@@ -15,5 +15,6 @@ public class Main implements ModInitializer {
         GBlocks.bootstrap();
         GItems.bootstrap();
         GEntities.bootstrap();
+        GSounds.bootstrap();
     }
 }

@@ -12,7 +12,7 @@
     "issues": "https://github.com/Sollace/CopperGolem/issues"
   },
   "license": "MIT",
-  "icon": "copper_golem_logo.png",
+  "icon": "copper_golem_icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
