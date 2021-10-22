@@ -12,7 +12,7 @@ public abstract class BlockInteraction extends PositionFinder {
         super(entity, maxDistance);
     }
 
-    public abstract void perform(CopperGolemEntity entity, BlockPos pos, BlockState state);
+    public abstract boolean perform(CopperGolemEntity entity, BlockPos pos, BlockState state);
 
     public static BlockInteraction create(CopperGolemEntity golem, int maxDistance) {
         return golem.getStackInHand(Hand.MAIN_HAND).isEmpty()

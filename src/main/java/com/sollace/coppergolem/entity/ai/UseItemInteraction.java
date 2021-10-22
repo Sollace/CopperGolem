@@ -37,11 +37,11 @@ class UseItemInteraction extends BlockInteraction {
     }
 
     @Override
-    public void perform(CopperGolemEntity entity, BlockPos pos, BlockState state) {
+    public boolean perform(CopperGolemEntity entity, BlockPos pos, BlockState state) {
         ItemStack stack = entity.getStackInHand(Hand.MAIN_HAND);
 
         if (stack.getItem() instanceof BlockItem) {
-            return;
+            return false;
         }
 
         ActionResult result = stack.useOnBlock(new AutomaticItemPlacementContext(entity.getEntityWorld(), pos, entity.getHorizontalFacing(), stack, Direction.UP));
@@ -56,12 +56,14 @@ class UseItemInteraction extends BlockInteraction {
             nonMatchingBlocks.remove(id);
             matchingBlocks.add(id);
             knownPositions.clear();
-        } else {
-            if (!matchingBlocks.contains(id)) {
-                nonMatchingBlocks.add(id);
-            }
-            entity.expressDissappointment();
+            return true;
         }
+
+        if (!matchingBlocks.contains(id)) {
+            nonMatchingBlocks.add(id);
+        }
+        entity.expressDissappointment();
+        return false;
     }
 
     @Override

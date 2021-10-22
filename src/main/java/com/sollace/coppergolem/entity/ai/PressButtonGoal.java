@@ -97,10 +97,12 @@ public class PressButtonGoal extends Goal {
                 entity.getNavigation().setSpeed(getWalkSpeedTo(pos));
                 entity.getLookControl().lookAt(pos.getX(), pos.getY(), pos.getZ());
 
-                System.out.println("Distance: " + entity.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()));
-
                 if (entity.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) < 2) {
-                    finder.perform(entity, pos, state);
+                    if (finder.perform(entity, pos, state)) {
+                        BlockPos entityPos = entity.getBlockPos();
+
+                        entity.setReachDirection(entityPos.getY() < pos.getY() ? CopperGolemEntity.REACHING_UP : CopperGolemEntity.REACHING_DOWN);
+                    }
                     stop();
                 }
             }, () -> {

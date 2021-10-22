@@ -14,10 +14,11 @@ class ClickButtonInteraction extends BlockInteraction {
     }
 
     @Override
-    public void perform(CopperGolemEntity entity, BlockPos pos, BlockState state) {
+    public boolean perform(CopperGolemEntity entity, BlockPos pos, BlockState state) {
         entity.swingHand(Hand.MAIN_HAND);
 
         ((AbstractButtonBlock)state.getBlock()).powerOn(state, entity.getEntityWorld(), pos);
+        return true;
     }
 
     @Override

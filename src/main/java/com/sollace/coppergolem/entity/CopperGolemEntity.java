@@ -62,6 +62,11 @@ public class CopperGolemEntity extends GolemEntity {
     protected static final TrackedData<Integer> OXIDATION = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.INTEGER);
     protected static final TrackedData<Integer> WIGGLING_NOSE_TIME = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.INTEGER);
     protected static final TrackedData<Integer> SPINNING_HEAD_TIME = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    protected static final TrackedData<Byte> REACH_DIRECTION = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.BYTE);
+
+    public static final byte REACHING_NONE = 0;
+    public static final byte REACHING_UP = 1;
+    public static final byte REACHING_DOWN = 2;
 
     public static final byte SCRAPE_STATUS = 4;
     public static final byte WAX_ON_STATUS = 5;
@@ -77,6 +82,8 @@ public class CopperGolemEntity extends GolemEntity {
             .build();
 
     protected boolean waxed;
+
+    private int reachingTicks;
 
     private final Map<Identifier, BlockInteraction> finders = new HashMap<>();
 
@@ -100,6 +107,7 @@ public class CopperGolemEntity extends GolemEntity {
         dataTracker.startTracking(OXIDATION, 0);
         dataTracker.startTracking(WIGGLING_NOSE_TIME, 0);
         dataTracker.startTracking(SPINNING_HEAD_TIME, 0);
+        dataTracker.startTracking(REACH_DIRECTION, REACHING_NONE);
     }
 
     public BlockInteraction getFinder(int maxDistance) {
@@ -166,6 +174,15 @@ public class CopperGolemEntity extends GolemEntity {
         setOxidation(level.ordinal() * 100);
     }
 
+    public byte getReachDirection() {
+        return dataTracker.get(REACH_DIRECTION);
+    }
+
+    public void setReachDirection(byte direction) {
+        dataTracker.set(REACH_DIRECTION, direction);
+        reachingTicks = direction == REACHING_NONE ? 0 : 9;
+    }
+
     public boolean isWigglingNose() {
         return dataTracker.get(WIGGLING_NOSE_TIME) > 0;
     }
@@ -207,6 +224,7 @@ public class CopperGolemEntity extends GolemEntity {
         return inanimate;
     }
 
+    @Override
     public void tick() {
         inanimate = isImmobile();
         if (inanimate) {
@@ -234,6 +252,12 @@ public class CopperGolemEntity extends GolemEntity {
             this.handSwingProgress = handSwingProgress;
             this.lastHandSwingProgress = handSwingProgress;
         } else {
+            if (reachingTicks > 0) {
+                if (--reachingTicks == 0) {
+                    setReachDirection(REACHING_NONE);
+                }
+            }
+
             super.tick();
         }
     }
