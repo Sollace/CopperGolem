@@ -74,6 +74,7 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
 
         if (entity.inanimate) {
             limbAngle = entity.limbAngle - entity.limbDistance;
+            animationProgress = 1;
         }
 
         root.pivotY = 20;
@@ -85,6 +86,8 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
 
         head.yaw = headYaw * 0.017453292F + MathHelper.lerp(headSpinTime, 0, maxRotation);
         head.pitch = headSpinTime > 0 ? 0 : -headPitch * 0.017453292F;
+
+        body.pitch = MathHelper.lerp(handSwingProgress, 0, -0.25F);
 
         if (riding) {
             rightLeg.pitch = 1.5F;
@@ -98,17 +101,18 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
             rightLeg.pitch = -1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
             leftLeg.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
 
-            rightArm.pitch = -1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
-            leftArm.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+            if (entity.isChasing()) {
+                rightArm.pitch = 1.25F + (float)MathHelper.sin(animationProgress / 2) / 10F;
+                leftArm.pitch = 1.25F + (float)MathHelper.cos(animationProgress / 2) / 10F;
+            } else {
+                rightArm.pitch = -1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+                leftArm.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+            }
         }
-
-
-        body.pitch = MathHelper.lerp(handSwingProgress, 0, -0.25F);
 
         if (!entity.getStackInHand(Hand.MAIN_HAND).isEmpty()) {
             leftArm.pitch = 0.5F + MathHelper.lerp(handSwingProgress, 0, 1.5F);
         } else {
-
             rightArm.pitch +=  MathHelper.lerp(handSwingProgress, 0, 1.5F);
             leftArm.pitch +=  MathHelper.lerp(handSwingProgress, 0, 1.5F);
         }

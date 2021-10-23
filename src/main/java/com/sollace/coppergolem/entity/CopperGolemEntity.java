@@ -15,7 +15,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LightningEntity;
-import net.minecraft.entity.ai.goal.FleeEntityGoal;
+import net.minecraft.entity.ai.goal.FollowTargetGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.damage.DamageSource;
@@ -52,6 +52,7 @@ import com.sollace.coppergolem.GItems;
 import com.sollace.coppergolem.GSounds;
 import com.sollace.coppergolem.entity.ai.BlockInteraction;
 import com.sollace.coppergolem.entity.ai.PressButtonGoal;
+import com.sollace.coppergolem.entity.ai.ChaseTargetGoal;
 import com.sollace.coppergolem.entity.ai.VariantSpeedEscapeDangerGoal;
 import com.sollace.coppergolem.entity.ai.VariantSpeedWanderAroundFarGoal;
 import com.sollace.coppergolem.util.BlockStatePredicates;
@@ -65,6 +66,7 @@ public class CopperGolemEntity extends GolemEntity {
     protected static final TrackedData<Integer> OXIDATION = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.INTEGER);
     protected static final TrackedData<Integer> WIGGLING_NOSE_TIME = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.INTEGER);
     protected static final TrackedData<Integer> SPINNING_HEAD_TIME = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    protected static final TrackedData<Boolean> CHASING = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     protected static final TrackedData<Byte> REACH_DIRECTION = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.BYTE);
     protected static final TrackedData<NbtCompound> POSING = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.TAG_COMPOUND);
 
@@ -97,12 +99,13 @@ public class CopperGolemEntity extends GolemEntity {
 
     @Override
     protected void initGoals() {
-        goalSelector.add(1, new FleeEntityGoal<>(this, CatEntity.class, 10, 0.5, 1));
+        goalSelector.add(1, new ChaseTargetGoal(this));
         goalSelector.add(2, new VariantSpeedEscapeDangerGoal(this));
         goalSelector.add(2, new PressButtonGoal(this, 14, 30));
         goalSelector.add(3, new VariantSpeedWanderAroundFarGoal(this));
         goalSelector.add(7, new LookAtEntityGoal(this, PlayerEntity.class, 6));
         goalSelector.add(8, new LookAroundGoal(this));
+        targetSelector.add(1, new FollowTargetGoal<>(this, CatEntity.class, true, true));
     }
 
     @Override
@@ -111,6 +114,7 @@ public class CopperGolemEntity extends GolemEntity {
         dataTracker.startTracking(OXIDATION, 0);
         dataTracker.startTracking(WIGGLING_NOSE_TIME, 0);
         dataTracker.startTracking(SPINNING_HEAD_TIME, 0);
+        dataTracker.startTracking(CHASING, false);
         dataTracker.startTracking(REACH_DIRECTION, REACHING_NONE);
         dataTracker.startTracking(POSING, new NbtCompound());
     }
@@ -186,6 +190,18 @@ public class CopperGolemEntity extends GolemEntity {
     public void setReachDirection(byte direction) {
         dataTracker.set(REACH_DIRECTION, direction);
         reachingTicks = direction == REACHING_NONE ? 0 : 9;
+    }
+
+    public boolean isChasing() {
+        return dataTracker.get(CHASING);
+    }
+
+    public void setChasing(boolean chasing) {
+        dataTracker.set(CHASING, chasing);
+    }
+
+    public double getArmReach() {
+        return getWidth() * 2 * getWidth() * 2;
     }
 
     public boolean isWigglingNose() {
