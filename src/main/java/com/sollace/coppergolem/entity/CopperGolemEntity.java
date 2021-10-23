@@ -339,12 +339,14 @@ public class CopperGolemEntity extends GolemEntity {
         } else {
             ItemStack heldStack = getStackInHand(Hand.MAIN_HAND);
 
-            if (stack.isEmpty() && !heldStack.isEmpty()) {
-                player.getInventory().offerOrDrop(heldStack);
+            if (stack.isEmpty()) {
+                if (!heldStack.isEmpty()) {
+                    player.getInventory().offerOrDrop(heldStack);
 
-                equipStack(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
-                playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1, 1);
-                return ActionResult.SUCCESS;
+                    equipStack(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
+                    playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1, 1);
+                    return ActionResult.SUCCESS;
+                }
             } else if (heldStack.isEmpty() || ItemStack.canCombine(heldStack, stack)) {
                 ItemStack newStack = stack.split(1);
                 newStack.increment(heldStack.getCount());
