@@ -383,10 +383,13 @@ public class CopperGolemEntity extends GolemEntity {
     public void loadAngles(NbtCompound tag) {
         setPitch(tag.getFloat("pitch"));
         bodyYaw = tag.getFloat("bodyYaw");
+        prevBodyYaw = bodyYaw;
         stepBobbingAmount = tag.getFloat("stepBobbingAmount");
         limbAngle = tag.getFloat("limbAngle");
         limbDistance = tag.getFloat("limbDistance");
+        lastLimbDistance = limbDistance;
         handSwingProgress = tag.getFloat("handSwingProgress");
+        lastHandSwingProgress = handSwingProgress;
     }
 
     public NbtCompound storeAngles() {
