@@ -227,7 +227,7 @@ public class CopperGolemEntity extends GolemEntity {
 
     @Override
     public float getMovementSpeed() {
-        return 0.6F / (1 + getDegradationLevel().ordinal());
+        return 0.3F / (1 + getDegradationLevel().ordinal());
     }
 
     @Override
@@ -247,6 +247,7 @@ public class CopperGolemEntity extends GolemEntity {
 
     @Override
     public void tick() {
+
         inanimate = isImmobile();
 
         if (inanimate) {
