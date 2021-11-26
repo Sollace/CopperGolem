@@ -29,7 +29,6 @@ public class CopperGolemEntityRenderer extends MobEntityRenderer<CopperGolemEnti
 
     @Override
     public Identifier getTexture(CopperGolemEntity entity) {
-       // model = new CopperGolemEntityModel(CopperGolemEntityModel.getTexturedModelData().createModel());
         return textures.computeIfAbsent(entity.getDegradationLevel(), l -> new Identifier("copper_golem", "textures/entity/copper_golem/copper_golem_" + l.name().toLowerCase() + ".png"));
     }
 

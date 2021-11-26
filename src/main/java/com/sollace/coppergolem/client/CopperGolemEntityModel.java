@@ -32,37 +32,38 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
         this.body = root.getChild(EntityModelPartNames.BODY);
         this.head = body.getChild(EntityModelPartNames.HEAD);
         this.nose = head.getChild(EntityModelPartNames.NOSE);
-        this.rightArm = root.getChild(EntityModelPartNames.RIGHT_ARM);
-        this.leftArm = root.getChild(EntityModelPartNames.LEFT_ARM);
+        this.rightArm = body.getChild(EntityModelPartNames.RIGHT_ARM);
+        this.leftArm = body.getChild(EntityModelPartNames.LEFT_ARM);
         this.rightLeg = root.getChild(EntityModelPartNames.RIGHT_LEG);
         this.leftLeg = root.getChild(EntityModelPartNames.LEFT_LEG);
      }
 
-     public static TexturedModelData getTexturedModelData() {
+    public static TexturedModelData getTexturedModelData() {
         ModelData data = new ModelData();
         ModelPartData root = data.getRoot();
 
-        root.addChild(EntityModelPartNames.BODY, ModelPartBuilder.create()
-                .uv(0, 13).cuboid(-4, -7, -3, 8, 7, 5), ModelTransform.NONE)
-                .addChild(EntityModelPartNames.HEAD, ModelPartBuilder.create()
-                        .uv(36, 31).cuboid(-1, -1, -1.5F, 2, 2, 2)
-                        .uv(0, 0).cuboid(-4, -5, -4, 8, 5, 7)
-                        .uv(26, 16).cuboid(-1, -7, -1.5F, 2, 2, 2)
-                        .uv(0, 32).cuboid(-1.5F, -10, -2, 3, 3, 3), ModelTransform.pivot(0, -7, 0))
-                        .addChild(EntityModelPartNames.NOSE, ModelPartBuilder.create()
-                                .uv(36, 26).cuboid(-1, -1, 2, 2, 3, 2), ModelTransform.NONE);
-        root.addChild(EntityModelPartNames.RIGHT_ARM, ModelPartBuilder.create()
-                .uv(16, 26).cuboid(0, -1, -1.5F, 2, 9, 3), ModelTransform.pivot(-6, -6, -0.5F));
-        root.addChild(EntityModelPartNames.LEFT_ARM, ModelPartBuilder.create()
-                .uv(26, 26).cuboid(0, -1, -1.5F, 2, 9, 3), ModelTransform.pivot(4, -6, -0.5F));
+        ModelPartData body = root.addChild(EntityModelPartNames.BODY, ModelPartBuilder.create()
+                .uv(16, 16).cuboid(-5.75F, -9, -4, 12, 8, 6), ModelTransform.pivot(0, -5, 0));
+
+        body.addChild(EntityModelPartNames.HEAD, ModelPartBuilder.create()
+                        .uv(0, 0).cuboid(-6.25F, -4, -5, 13, 6, 10)
+                        .uv(36, 0).cuboid(-0.75F, -9, -1, 2, 5, 2)
+                        .uv(0, 22).cuboid(-1.75F, -12, -2, 4, 4, 4), ModelTransform.pivot(0, -11, -1))
+                .addChild(EntityModelPartNames.NOSE, ModelPartBuilder.create()
+                        .uv(0, 0).cuboid(-1.25F, -1, -1.5F, 3, 4, 2), ModelTransform.pivot(0, 0, -5));
+
+        body.addChild(EntityModelPartNames.RIGHT_ARM, ModelPartBuilder.create()
+                .uv(48, 0).cuboid(-1.75F, -2, -2, 4, 13, 4), ModelTransform.pivot(-8, -7, -1));
+
+        body.addChild(EntityModelPartNames.LEFT_ARM, ModelPartBuilder.create()
+                .uv(48, 0).cuboid(-2, -2, -2, 4, 13, 4), ModelTransform.pivot(8, -7, -1));
         root.addChild(EntityModelPartNames.RIGHT_LEG, ModelPartBuilder.create()
-                .uv(26, 9).cuboid(-2, 0, -3, 4, 3, 4)
-                .uv(23, 0).cuboid(-2, 3, -3, 4, 1, 5), ModelTransform.pivot(-2, 0, 0));
+                .uv(0, 30).cuboid(-2.85F, -1, -3, 6, 6, 6), ModelTransform.pivot(-3, -5, -1));
         root.addChild(EntityModelPartNames.LEFT_LEG, ModelPartBuilder.create()
-                .uv(0, 25).cuboid(-2, 0, -2, 4, 3, 4)
-                .uv(21, 20).cuboid(-2, 3, -2, 4, 1, 5), ModelTransform.pivot(2, 0, 0));
+                .uv(0, 30).cuboid(-3.15F, -1, -3, 6, 6, 6), ModelTransform.pivot(3, -5, -1));
+
         return TexturedModelData.of(data, 64, 64);
-     }
+    }
 
     @Override
     public ModelPart getPart() {
@@ -77,51 +78,52 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
             animationProgress = 1;
         }
 
-        root.pivotY = 20;
-        root.yaw = (float)Math.PI;
+        root.pivotY = 24;
 
         float headSpinTime = (float)entity.getHeadSpinTime() / 10;
 
         float maxRotation = 2 * (float)Math.PI;
 
         head.yaw = headYaw * 0.017453292F + MathHelper.lerp(headSpinTime, 0, maxRotation);
-        head.pitch = headSpinTime > 0 ? 0 : -headPitch * 0.017453292F;
+        head.pitch = headSpinTime > 0 ? 0 : headPitch * 0.017453292F;
 
-        body.pitch = MathHelper.lerp(handSwingProgress, 0, -0.25F);
+        body.pitch = MathHelper.lerp(handSwingProgress, 0, 0.25F);
 
         if (riding) {
-            rightLeg.pitch = 1.5F;
-            rightLeg.yaw = -0.5F;
-            leftLeg.pitch = 1.5F;
-            leftLeg.yaw = 0.5F;
+            rightLeg.pitch = -1.5F;
+            rightLeg.yaw = 0.5F;
+            leftLeg.pitch = -1.5F;
+            leftLeg.yaw = -0.5F;
 
-            rightArm.pitch = 1.25F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
-            leftArm.pitch = 1.25F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+            rightArm.pitch = -1.25F - 1.125F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+            leftArm.pitch = -1.25F - 1.125F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
         } else {
+            rightLeg.yaw = 0;
             rightLeg.pitch = -1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+            leftLeg.yaw = 0;
             leftLeg.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
 
             if (entity.isChasing()) {
-                rightArm.pitch = 1.25F + (float)MathHelper.sin(animationProgress / 2) / 10F;
-                leftArm.pitch = 1.25F + (float)MathHelper.cos(animationProgress / 2) / 10F;
+                rightArm.pitch = -1.25F + (float)MathHelper.sin(animationProgress / 2) / 10F;
+                leftArm.pitch = -1.25F + (float)MathHelper.cos(animationProgress / 2) / 10F;
             } else {
-                rightArm.pitch = -1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
-                leftArm.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+                rightArm.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+                leftArm.pitch = -1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
             }
         }
 
         if (!entity.getStackInHand(Hand.MAIN_HAND).isEmpty()) {
-            leftArm.pitch = 0.5F + MathHelper.lerp(handSwingProgress, 0, 1.5F);
+            leftArm.pitch = 0.5F - MathHelper.lerp(handSwingProgress, 0, 1.5F);
         } else {
-            rightArm.pitch +=  MathHelper.lerp(handSwingProgress, 0, 1.5F);
-            leftArm.pitch +=  MathHelper.lerp(handSwingProgress, 0, 1.5F);
+            rightArm.pitch -=  MathHelper.lerp(handSwingProgress, 0, 1.5F);
+            leftArm.pitch -=  MathHelper.lerp(handSwingProgress, 0, 1.5F);
         }
 
         if (!entity.isWigglingNose()) {
             nose.roll = 0;
             nose.pitch = MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
         } else if (!entity.inanimate) {
-            nose.roll = (float)Math.random() - 0.5F;
+            nose.roll = MathHelper.sin(entity.age) / 3;
         }
     }
 }
