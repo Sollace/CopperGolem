@@ -9,7 +9,7 @@ import java.util.Random;
 
 public class OxidizableCopperButtonBlock extends CopperButtonBlock implements Oxidizable {
 
-    protected OxidizableCopperButtonBlock(Oxidizable.OxidizationLevel oxidizationLevel, Settings settings) {
+    protected OxidizableCopperButtonBlock(Oxidizable.OxidationLevel oxidizationLevel, Settings settings) {
         super(oxidizationLevel, settings);
     }
 
@@ -24,7 +24,7 @@ public class OxidizableCopperButtonBlock extends CopperButtonBlock implements Ox
     }
 
     @Override
-    public Oxidizable.OxidizationLevel getDegradationLevel() {
+    public Oxidizable.OxidationLevel getDegradationLevel() {
        return this.oxidizationLevel;
     }
 }

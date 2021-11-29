@@ -1,13 +1,13 @@
 plugins {
     id 'java-library'
-    id 'fabric-loom' version '0.8-SNAPSHOT'
+    id 'fabric-loom' version '0.10-SNAPSHOT'
     id 'maven-publish'
     id 'org.ajoberstar.reckon' version '0.13.0'
 }
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(16)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
@@ -15,8 +15,8 @@ group = project.group
 description = project.displayname
 archivesBaseName = project.name
 
-minecraft {
-    refmapName = 'copper_golem.mixin.refmap.json'
+loom {
+    mixin.defaultRefmapName = 'copper_golem.mixin.refmap.json'
 }
 
 reckon {

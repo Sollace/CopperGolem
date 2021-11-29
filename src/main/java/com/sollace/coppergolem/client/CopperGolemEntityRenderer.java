@@ -1,6 +1,6 @@
 package com.sollace.coppergolem.client;
 
-import net.minecraft.block.Oxidizable.OxidizationLevel;
+import net.minecraft.block.Oxidizable.OxidationLevel;
 import net.minecraft.client.render.entity.EntityRendererFactory.Context;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CopperGolemEntityRenderer extends MobEntityRenderer<CopperGolemEntity, CopperGolemEntityModel> {
-    private final Map<OxidizationLevel, Identifier> textures = new HashMap<>();
+    private final Map<OxidationLevel, Identifier> textures = new HashMap<>();
 
     public CopperGolemEntityRenderer(Context ctx) {
         super(ctx, new CopperGolemEntityModel(CopperGolemEntityModel.getTexturedModelData().createModel()), 0.3F);

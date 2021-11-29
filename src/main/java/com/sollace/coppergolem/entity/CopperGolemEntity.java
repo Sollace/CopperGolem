@@ -6,7 +6,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 import net.minecraft.block.Oxidizable;
-import net.minecraft.block.Oxidizable.OxidizationLevel;
+import net.minecraft.block.Oxidizable.OxidationLevel;
 import net.minecraft.block.WallMountedBlock;
 import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.block.pattern.BlockPatternBuilder;
@@ -15,7 +15,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LightningEntity;
-import net.minecraft.entity.ai.goal.FollowTargetGoal;
+import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.damage.DamageSource;
@@ -105,7 +105,7 @@ public class CopperGolemEntity extends GolemEntity {
         goalSelector.add(3, new VariantSpeedWanderAroundFarGoal(this));
         goalSelector.add(7, new LookAtEntityGoal(this, PlayerEntity.class, 6));
         goalSelector.add(8, new LookAroundGoal(this));
-        targetSelector.add(1, new FollowTargetGoal<>(this, CatEntity.class, true, true));
+        targetSelector.add(1, new ActiveTargetGoal<>(this, CatEntity.class, true, true));
     }
 
     @Override
@@ -164,22 +164,22 @@ public class CopperGolemEntity extends GolemEntity {
     }
 
     public void setOxidation(int oxidation) {
-        dataTracker.set(OXIDATION, MathHelper.clamp(oxidation, 0, (Oxidizable.OxidizationLevel.values().length - 1) * 100));
+        dataTracker.set(OXIDATION, MathHelper.clamp(oxidation, 0, (Oxidizable.OxidationLevel.values().length - 1) * 100));
     }
 
     public int getOxidation() {
         return dataTracker.get(OXIDATION);
     }
 
-    public OxidizationLevel getDegradationLevel() {
+    public OxidationLevel getDegradationLevel() {
         int oxidation = (int)Math.floor((float)getOxidation() / 100F);
 
-        var levels = Oxidizable.OxidizationLevel.values();
+        var levels = Oxidizable.OxidationLevel.values();
 
         return levels[MathHelper.clamp(oxidation, 0, levels.length - 1)];
     }
 
-    public void setDegradationLevel(OxidizationLevel level) {
+    public void setDegradationLevel(OxidationLevel level) {
         setOxidation(level.ordinal() * 100);
     }
 
@@ -237,7 +237,7 @@ public class CopperGolemEntity extends GolemEntity {
 
     @Override
     protected boolean isImmobile() {
-        return super.isImmobile() || getDegradationLevel() == OxidizationLevel.OXIDIZED;
+        return super.isImmobile() || getDegradationLevel() == OxidationLevel.OXIDIZED;
     }
 
     @Override
@@ -494,7 +494,7 @@ public class CopperGolemEntity extends GolemEntity {
             return false;
         }
 
-        OxidizationLevel[] oxidation = new OxidizationLevel[] { OxidizationLevel.UNAFFECTED };
+        OxidationLevel[] oxidation = new OxidationLevel[] { OxidationLevel.UNAFFECTED };
 
         iterateAround(result, position -> {
             if (position.getBlockState().getBlock() instanceof WallMountedBlock) {
@@ -521,7 +521,7 @@ public class CopperGolemEntity extends GolemEntity {
 
         world.spawnEntity(golem);
 
-        if (oxidation[0] != OxidizationLevel.OXIDIZED || golem.getRandom().nextBoolean()) {
+        if (oxidation[0] != OxidationLevel.OXIDIZED || golem.getRandom().nextBoolean()) {
             golem.spinHead();
         }
 
