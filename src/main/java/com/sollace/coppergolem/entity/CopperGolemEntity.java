@@ -337,6 +337,20 @@ public class CopperGolemEntity extends GolemEntity {
             }
 
             return ActionResult.SUCCESS;
+        } else if (stack.isOf(Items.COPPER_INGOT)) {
+            if (getHealth() < getMaxHealth()) {
+                playSound(SoundEvents.ENTITY_IRON_GOLEM_REPAIR, 1, 1);
+                spinHead();
+                stack.decrement(1);
+                heal(5);
+                swingHand(Hand.MAIN_HAND);
+                return ActionResult.SUCCESS;
+            }
+
+            spinHead();
+            playSound(GSounds.ENTITY_COPPER_GOLEM_NO, 1, 1);
+
+            return ActionResult.FAIL;
         } else {
             ItemStack heldStack = getStackInHand(Hand.MAIN_HAND);
 
