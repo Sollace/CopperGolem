@@ -2,11 +2,11 @@ package com.sollace.coppergolem.entity.ai;
 
 import net.minecraft.block.AbstractButtonBlock;
 import net.minecraft.block.BlockState;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 
 import com.sollace.coppergolem.CopperButtonBlock;
+import com.sollace.coppergolem.GSounds;
 import com.sollace.coppergolem.entity.CopperGolemEntity;
 
 class ClickButtonInteraction extends BlockInteraction {
@@ -19,7 +19,9 @@ class ClickButtonInteraction extends BlockInteraction {
         entity.swingHand(Hand.MAIN_HAND);
 
         ((AbstractButtonBlock)state.getBlock()).powerOn(state, entity.getEntityWorld(), pos);
-        entity.playSound(SoundEvents.ENTITY_VILLAGER_AMBIENT, 1, entity.getSoundPitch());
+        if (entity.getRandom().nextInt(10) < 2) {
+            entity.playSound(GSounds.ENTITY_COPPER_GOLEM_AMBIENT, 1, entity.getSoundPitch());
+        }
         return true;
     }
 
