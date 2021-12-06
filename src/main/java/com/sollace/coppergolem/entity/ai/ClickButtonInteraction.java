@@ -2,6 +2,7 @@ package com.sollace.coppergolem.entity.ai;
 
 import net.minecraft.block.AbstractButtonBlock;
 import net.minecraft.block.BlockState;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 
@@ -18,6 +19,7 @@ class ClickButtonInteraction extends BlockInteraction {
         entity.swingHand(Hand.MAIN_HAND);
 
         ((AbstractButtonBlock)state.getBlock()).powerOn(state, entity.getEntityWorld(), pos);
+        entity.playSound(SoundEvents.ENTITY_VILLAGER_AMBIENT, 1, entity.getSoundPitch());
         return true;
     }
 

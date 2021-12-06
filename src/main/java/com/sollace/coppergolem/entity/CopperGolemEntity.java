@@ -348,7 +348,7 @@ public class CopperGolemEntity extends GolemEntity {
             }
 
             spinHead();
-            playSound(GSounds.ENTITY_COPPER_GOLEM_NO, 1, 1);
+            playSound(GSounds.ENTITY_COPPER_GOLEM_NO, getSoundVolume(), getSoundPitch());
 
             return ActionResult.FAIL;
         } else {
