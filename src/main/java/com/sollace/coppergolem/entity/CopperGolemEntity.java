@@ -118,9 +118,7 @@ public class CopperGolemEntity extends GolemEntity {
     }
 
     public BlockInteraction getFinder(int maxDistance) {
-        return finders.computeIfAbsent(Registry.ITEM.getId(getStackInHand(Hand.MAIN_HAND).getItem()), id -> {
-            return BlockInteraction.create(this, maxDistance);
-        });
+        return finders.computeIfAbsent(Registry.ITEM.getId(getStackInHand(Hand.MAIN_HAND).getItem()), id -> BlockInteraction.create(this, maxDistance));
     }
 
     @Override
@@ -249,7 +247,7 @@ public class CopperGolemEntity extends GolemEntity {
         inanimate = isImmobile();
 
         if (inanimate) {
-            if (!getPosing().isPresent() && !world.isClient) {
+            if (getPosing().isEmpty() && !world.isClient) {
                 setPosing(Optional.of(storeAngles()));
             }
 
@@ -384,6 +382,7 @@ public class CopperGolemEntity extends GolemEntity {
         }
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public void setPosing(Optional<NbtCompound> posing) {
         NbtCompound tag = new NbtCompound();
         posing.ifPresent(t -> tag.put("posing", t));
@@ -425,9 +424,7 @@ public class CopperGolemEntity extends GolemEntity {
         nbt.putBoolean("waxed", waxed);
 
         NbtCompound modules = new NbtCompound();
-        finders.forEach((block, module) -> {
-            modules.put(block.toString(), module.toNbt());
-        });
+        finders.forEach((block, module) -> modules.put(block.toString(), module.toNbt()));
         nbt.put("interactionMemories", modules);
         getPosing().ifPresent(posing -> nbt.put("posing", posing));
     }
@@ -500,6 +497,7 @@ public class CopperGolemEntity extends GolemEntity {
         return 1.8F;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public static boolean tryBuild(World world, BlockPos pos) {
         BlockPattern.Result result = PATTERN.searchAround(world, pos);
         if (result == null) {
@@ -537,9 +535,7 @@ public class CopperGolemEntity extends GolemEntity {
             golem.spinHead();
         }
 
-        iterateAround(result, position -> {
-            world.updateNeighbors(position.getBlockPos(), Blocks.AIR);
-        });
+        iterateAround(result, position -> world.updateNeighbors(position.getBlockPos(), Blocks.AIR));
 
         return true;
     }

@@ -13,6 +13,7 @@ public interface GEntities {
         .makeFireImmune()
         .setDimensions(0.6F, 0.99F));
 
+    @SuppressWarnings("SameParameterValue")
     private static <T extends Entity> EntityType<T> register(String name, EntityType.Builder<T> builder) {
         return Registry.register(Registry.ENTITY_TYPE, new Identifier("copper_golem", name), builder.build(name));
     }

@@ -6,10 +6,8 @@ import net.minecraft.entity.ai.goal.GoalSelector;
 import net.minecraft.entity.mob.MobEntity;
 
 public interface MobEntityInitGoalsListener {
-    Event<MobEntityInitGoalsListener> EVENT = EventFactory.createArrayBacked(MobEntityInitGoalsListener.class, handlers -> {
-        return (mob, goals, targets) -> {
-            for (var i : handlers) i.initGoals(mob, goals, targets);
-        };
+    Event<MobEntityInitGoalsListener> EVENT = EventFactory.createArrayBacked(MobEntityInitGoalsListener.class, handlers -> (mob, goals, targets) -> {
+        for (var i : handlers) i.initGoals(mob, goals, targets);
     });
 
     void initGoals(MobEntity mob, GoalSelector goals, GoalSelector targets);

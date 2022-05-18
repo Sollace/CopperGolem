@@ -18,6 +18,7 @@ public class PressButtonGoal extends Goal {
 
     private int idleTicks;
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<BlockPos> target = Optional.empty();
 
     private final Map<BlockPos, Long> visitedPositions = new HashMap<>();
@@ -91,24 +92,22 @@ public class PressButtonGoal extends Goal {
 
         BlockInteraction finder = entity.getFinder(maxDistance);
 
-        target.ifPresent(pos -> {
-            target.map(finder::toState).filter(finder::isValid).ifPresentOrElse(state -> {
-                entity.getNavigation().setSpeed(getWalkSpeedTo(pos));
-                entity.getLookControl().lookAt(pos.getX(), pos.getY(), pos.getZ());
+        target.ifPresent(pos -> target.map(finder::toState).filter(finder::isValid).ifPresentOrElse(state -> {
+            entity.getNavigation().setSpeed(getWalkSpeedTo(pos));
+            entity.getLookControl().lookAt(pos.getX(), pos.getY(), pos.getZ());
 
-                if (entity.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) < 2) {
-                    if (finder.perform(entity, pos, state)) {
-                        BlockPos entityPos = entity.getBlockPos();
+            if (entity.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) < 2) {
+                if (finder.perform(entity, pos, state)) {
+                    BlockPos entityPos = entity.getBlockPos();
 
-                        entity.setReachDirection(entityPos.getY() < pos.getY() ? CopperGolemEntity.REACHING_UP : CopperGolemEntity.REACHING_DOWN);
-                    }
-                    stop();
+                    entity.setReachDirection(entityPos.getY() < pos.getY() ? CopperGolemEntity.REACHING_UP : CopperGolemEntity.REACHING_DOWN);
                 }
-            }, () -> {
-                entity.expressDissappointment();
                 stop();
-            });
-        });
+            }
+        }, () -> {
+            entity.expressDissappointment();
+            stop();
+        }));
     }
 
     private boolean recentlyVisited(BlockPos pos) {

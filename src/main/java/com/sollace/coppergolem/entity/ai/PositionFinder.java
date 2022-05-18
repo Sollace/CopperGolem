@@ -53,7 +53,7 @@ public abstract class PositionFinder {
     }
 
     private Stream<BlockPos> findPositions() {
-        knownPositions.removeIf(p -> !entity.getEntityWorld().isChunkLoaded(p) || !isValid(toState(p)));
+        knownPositions.removeIf(p -> !entity.getEntityWorld().isChunkLoaded(p.getX(), p.getZ()) || !isValid(toState(p)));
 
         if (scanCounter-- <= 0) {
             scanCounter = MAX_SCAN_TICKS;
@@ -69,7 +69,7 @@ public abstract class PositionFinder {
     protected Stream<BlockPos> searchArea(int range) {
         var stream = BlockPos.streamOutwards(entity.getBlockPos(), range, range, range)
             .filter(this::isExposed)
-            .filter(p -> entity.getEntityWorld().isChunkLoaded(p) && isValid(toState(p)));
+            .filter(p -> entity.getEntityWorld().isChunkLoaded(p.getX(), p.getZ()) && isValid(toState(p)));
 
         if (minWalkDistance > 0) {
             stream = stream.filter(p -> knownPositions.stream().noneMatch(i -> p.isWithinDistance(p, minWalkDistance)));

@@ -31,7 +31,7 @@ public class CopperGolemEntityRenderer extends MobEntityRenderer<CopperGolemEnti
         return textures.computeIfAbsent(entity.getDegradationLevel(), l -> new Identifier("copper_golem", "textures/entity/copper_golem/copper_golem_" + l.name().toLowerCase() + ".png"));
     }
 
-    public class HeldItem extends FeatureRenderer<CopperGolemEntity, CopperGolemEntityModel> {
+    public static class HeldItem extends FeatureRenderer<CopperGolemEntity, CopperGolemEntityModel> {
         public HeldItem(FeatureRendererContext<CopperGolemEntity, CopperGolemEntityModel> context) {
             super(context);
         }
