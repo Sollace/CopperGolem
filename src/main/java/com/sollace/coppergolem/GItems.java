@@ -24,9 +24,10 @@ public interface GItems {
         return Registry.register(Registry.ITEM, new Identifier("copper_golem", name), new BlockItem(block, new Item.Settings().group(ItemGroup.REDSTONE)));
     }
 
-    static void bootstrap() {}
+    static void bootstrap() {
+    }
 
-    public interface Tags {
+    interface Tags {
         Tag<Item> COPPER_GOLEM_CAN_PICK_UP = register("copper_golem_can_pick_up");
 
         static Tag<Item> register(String name) {

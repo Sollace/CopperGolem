@@ -1,11 +1,9 @@
 package com.sollace.coppergolem.entity.ai;
 
+import com.sollace.coppergolem.entity.CopperGolemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
-
 import org.jetbrains.annotations.Nullable;
-
-import com.sollace.coppergolem.entity.CopperGolemEntity;
 
 import java.util.EnumSet;
 

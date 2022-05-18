@@ -25,6 +25,6 @@ public class OxidizableCopperButtonBlock extends CopperButtonBlock implements Ox
 
     @Override
     public Oxidizable.OxidationLevel getDegradationLevel() {
-       return this.oxidizationLevel;
+        return this.oxidizationLevel;
     }
 }

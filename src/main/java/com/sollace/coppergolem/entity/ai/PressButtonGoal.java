@@ -1,10 +1,9 @@
 package com.sollace.coppergolem.entity.ai;
 
+import com.sollace.coppergolem.entity.CopperGolemEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.util.math.BlockPos;
-
-import com.sollace.coppergolem.entity.CopperGolemEntity;
 
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -59,13 +58,13 @@ public class PressButtonGoal extends Goal {
         }
 
         target = entity.getFinder(maxDistance).pickAny(pos -> {
-           Path path = entity.getNavigation().findPathTo(pos, 1);
-           if (path == null || path.getLength() == 1 || recentlyVisited(pos)) {
-               return false;
-           }
+            Path path = entity.getNavigation().findPathTo(pos, 1);
+            if (path == null || path.getLength() == 1 || recentlyVisited(pos)) {
+                return false;
+            }
 
-           entity.getNavigation().startMovingAlong(path, getWalkSpeedTo(path.getTarget()));
-           return true;
+            entity.getNavigation().startMovingAlong(path, getWalkSpeedTo(path.getTarget()));
+            return true;
         });
     }
 
@@ -116,7 +115,7 @@ public class PressButtonGoal extends Goal {
         visitedPositions.values().removeIf(l -> l < entity.age);
 
         boolean visited = visitedPositions.containsKey(pos);
-        long visitTime = visitedPositions.computeIfAbsent(pos, p -> (long)entity.age + 10 + entity.getRandom().nextInt(130));
+        long visitTime = visitedPositions.computeIfAbsent(pos, p -> (long) entity.age + 10 + entity.getRandom().nextInt(130));
 
         return visited && visitTime >= entity.age;
     }

@@ -1,10 +1,9 @@
 package com.sollace.coppergolem.registry;
 
-import net.minecraft.block.Block;
-
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.sollace.coppergolem.Main;
+import net.minecraft.block.Block;
 
 import java.util.function.Supplier;
 
@@ -44,12 +43,12 @@ public class MemoizeBackedRegistry {
             try {
                 f.setAccessible(true);
                 if (f.getType() == com.google.common.base.Supplier.class) {
-                    vanilla = (com.google.common.base.Supplier<BiMap<Block, Block>>)f.get(replacing);
+                    vanilla = (com.google.common.base.Supplier<BiMap<Block, Block>>) f.get(replacing);
                     if (vanilla == null) {
                         var data = replacing.get();
                         vanilla = () -> data;
                     }
-                    f.set(replacing, (com.google.common.base.Supplier<BiMap<Block, Block>>)(() -> {
+                    f.set(replacing, (com.google.common.base.Supplier<BiMap<Block, Block>>) (() -> {
                         if (compiled.isEmpty()) {
                             compiled.putAll(vanilla.get());
                             compiled.putAll(entries);

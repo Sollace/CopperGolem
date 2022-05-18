@@ -1,13 +1,12 @@
 {
-    "required": true,
-    "minVersion": "0.7",
-    "package": "com.sollace.coppergolem.mixin",
-    "refmap": "copper_golem.mixin.refmap.json",
-    "compatibilityLevel": "JAVA_16",
-    "mixins": [
-    	"MixinAbstractButtonBlock",
-    	"MixinMobEntity"
-    ],
-    "client": [
-    ]
+  "required": true,
+  "minVersion": "0.7",
+  "package": "com.sollace.coppergolem.mixin",
+  "refmap": "copper_golem.mixin.refmap.json",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "MixinAbstractButtonBlock",
+    "MixinMobEntity"
+  ],
+  "client": []
 }
