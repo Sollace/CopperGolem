@@ -1,6 +1,5 @@
 package com.sollace.coppergolem.entity.ai;
 
-import com.sollace.coppergolem.entity.CopperGolemEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -8,6 +7,8 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtLong;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+
+import com.sollace.coppergolem.entity.CopperGolemEntity;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -68,8 +69,8 @@ public abstract class PositionFinder {
 
     protected Stream<BlockPos> searchArea(int range) {
         var stream = BlockPos.streamOutwards(entity.getBlockPos(), range, range, range)
-            .filter(this::isExposed)
-            .filter(p -> entity.getEntityWorld().isChunkLoaded(p.getX(), p.getZ()) && isValid(toState(p)));
+                .filter(this::isExposed)
+                .filter(p -> entity.getEntityWorld().isChunkLoaded(p.getX(), p.getZ()) && isValid(toState(p)));
 
         if (minWalkDistance > 0) {
             stream = stream.filter(p -> knownPositions.stream().noneMatch(i -> p.isWithinDistance(p, minWalkDistance)));
@@ -89,7 +90,7 @@ public abstract class PositionFinder {
 
     public void readNbt(NbtCompound tag) {
         knownPositions.clear();
-        tag.getList("knownPositions", NbtElement.LONG_TYPE).stream().map(l -> BlockPos.fromLong(((NbtLong) l).longValue())).forEach(knownPositions::add);
+        tag.getList("knownPositions", NbtElement.LONG_TYPE).stream().map(l -> BlockPos.fromLong(((NbtLong)l).longValue())).forEach(knownPositions::add);
         maxScanDistance = tag.getInt("maxScanDistance");
         scanCounter = tag.getInt("scanCounter");
         minWalkDistance = tag.getInt("minWalkDistance");

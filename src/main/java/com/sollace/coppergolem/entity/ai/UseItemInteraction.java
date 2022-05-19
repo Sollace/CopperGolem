@@ -1,6 +1,5 @@
 package com.sollace.coppergolem.entity.ai;
 
-import com.sollace.coppergolem.entity.CopperGolemEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.AutomaticItemPlacementContext;
 import net.minecraft.item.BlockItem;
@@ -15,6 +14,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
+
+import com.sollace.coppergolem.entity.CopperGolemEntity;
 
 import java.util.HashSet;
 import java.util.Objects;

@@ -18,6 +18,5 @@ public interface GSounds {
         return Registry.register(Registry.SOUND_EVENT, id, new SoundEvent(id));
     }
 
-    static void bootstrap() {
-    }
+    static void bootstrap() {}
 }

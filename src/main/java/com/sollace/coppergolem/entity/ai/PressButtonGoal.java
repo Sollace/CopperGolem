@@ -1,9 +1,10 @@
 package com.sollace.coppergolem.entity.ai;
 
-import com.sollace.coppergolem.entity.CopperGolemEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.util.math.BlockPos;
+
+import com.sollace.coppergolem.entity.CopperGolemEntity;
 
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -18,7 +19,6 @@ public class PressButtonGoal extends Goal {
 
     private int idleTicks;
 
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<BlockPos> target = Optional.empty();
 
     private final Map<BlockPos, Long> visitedPositions = new HashMap<>();
@@ -92,29 +92,31 @@ public class PressButtonGoal extends Goal {
 
         BlockInteraction finder = entity.getFinder(maxDistance);
 
-        target.ifPresent(pos -> target.map(finder::toState).filter(finder::isValid).ifPresentOrElse(state -> {
-            entity.getNavigation().setSpeed(getWalkSpeedTo(pos));
-            entity.getLookControl().lookAt(pos.getX(), pos.getY(), pos.getZ());
+        target.ifPresent(pos -> {
+            target.map(finder::toState).filter(finder::isValid).ifPresentOrElse(state -> {
+                entity.getNavigation().setSpeed(getWalkSpeedTo(pos));
+                entity.getLookControl().lookAt(pos.getX(), pos.getY(), pos.getZ());
 
-            if (entity.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) < 2) {
-                if (finder.perform(entity, pos, state)) {
-                    BlockPos entityPos = entity.getBlockPos();
+                if (entity.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) < 2) {
+                    if (finder.perform(entity, pos, state)) {
+                        BlockPos entityPos = entity.getBlockPos();
 
-                    entity.setReachDirection(entityPos.getY() < pos.getY() ? CopperGolemEntity.REACHING_UP : CopperGolemEntity.REACHING_DOWN);
+                        entity.setReachDirection(entityPos.getY() < pos.getY() ? CopperGolemEntity.REACHING_UP : CopperGolemEntity.REACHING_DOWN);
+                    }
+                    stop();
                 }
+            }, () -> {
+                entity.expressDissappointment();
                 stop();
-            }
-        }, () -> {
-            entity.expressDissappointment();
-            stop();
-        }));
+            });
+        });
     }
 
     private boolean recentlyVisited(BlockPos pos) {
         visitedPositions.values().removeIf(l -> l < entity.age);
 
         boolean visited = visitedPositions.containsKey(pos);
-        long visitTime = visitedPositions.computeIfAbsent(pos, p -> (long) entity.age + 10 + entity.getRandom().nextInt(130));
+        long visitTime = visitedPositions.computeIfAbsent(pos, p -> (long)entity.age + 10 + entity.getRandom().nextInt(130));
 
         return visited && visitTime >= entity.age;
     }

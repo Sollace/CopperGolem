@@ -1,6 +1,5 @@
 package com.sollace.coppergolem.client;
 
-import com.sollace.coppergolem.entity.CopperGolemEntity;
 import net.minecraft.block.Oxidizable.OxidationLevel;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -14,6 +13,8 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3f;
+
+import com.sollace.coppergolem.entity.CopperGolemEntity;
 
 import java.util.HashMap;
 import java.util.Map;

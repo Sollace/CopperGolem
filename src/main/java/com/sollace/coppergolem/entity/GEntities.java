@@ -10,10 +10,9 @@ import net.minecraft.util.registry.Registry;
 public interface GEntities {
 
     EntityType<CopperGolemEntity> COPPER_GOLEM = register("copper_golem", EntityType.Builder.create(CopperGolemEntity::new, SpawnGroup.CREATURE)
-        .makeFireImmune()
-        .setDimensions(0.6F, 0.99F));
+            .makeFireImmune()
+            .setDimensions(0.6F, 0.99F));
 
-    @SuppressWarnings("SameParameterValue")
     private static <T extends Entity> EntityType<T> register(String name, EntityType.Builder<T> builder) {
         return Registry.register(Registry.ENTITY_TYPE, new Identifier("copper_golem", name), builder.build(name));
     }
