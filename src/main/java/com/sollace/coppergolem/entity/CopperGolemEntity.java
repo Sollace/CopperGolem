@@ -1,6 +1,6 @@
 package com.sollace.coppergolem.entity;
 
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -68,7 +68,7 @@ public class CopperGolemEntity extends GolemEntity {
     protected static final TrackedData<Integer> SPINNING_HEAD_TIME = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.INTEGER);
     protected static final TrackedData<Boolean> CHASING = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     protected static final TrackedData<Byte> REACH_DIRECTION = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.BYTE);
-    protected static final TrackedData<NbtCompound> POSING = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.TAG_COMPOUND);
+    protected static final TrackedData<NbtCompound> POSING = DataTracker.registerData(CopperGolemEntity.class, TrackedDataHandlerRegistry.NBT_COMPOUND);
 
     public static final byte REACHING_NONE = 0;
     public static final byte REACHING_UP = 1;
@@ -88,6 +88,7 @@ public class CopperGolemEntity extends GolemEntity {
             .build();
 
     protected boolean waxed;
+    public boolean inanimate;
 
     private int reachingTicks;
 
@@ -133,7 +134,7 @@ public class CopperGolemEntity extends GolemEntity {
             return true;
         }
 
-        return GItems.Tags.COPPER_GOLEM_CAN_PICK_UP.contains(stack.getItem());
+        return stack.isIn(GItems.Tags.COPPER_GOLEM_CAN_PICK_UP);
     }
 
     @Override
@@ -310,7 +311,7 @@ public class CopperGolemEntity extends GolemEntity {
     @Override
     protected ActionResult interactMob(PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
-        if (stack.isIn(FabricToolTags.AXES)) {
+        if (stack.isIn(ConventionalItemTags.AXES)) {
             if (waxed) {
                 waxed = false;
                 stack.damage(1, player, t -> t.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));

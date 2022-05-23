@@ -1,13 +1,12 @@
 package com.sollace.coppergolem;
 
-import net.fabricmc.fabric.api.tag.TagFactory;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.Material;
 import net.minecraft.block.Oxidizable;
 import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.tag.Tag;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -53,11 +52,11 @@ public interface GBlocks {
     }
 
     interface Tags {
-        Tag<Block> COPPER_GOLEM_MATERIALS = register("copper_golem_materials");
-        Tag<Block> COPPER_BUTTONS = register("copper_buttons");
+        TagKey<Block> COPPER_GOLEM_MATERIALS = register("copper_golem_materials");
+        TagKey<Block> COPPER_BUTTONS = register("copper_buttons");
 
-        static Tag<Block> register(String name) {
-            return TagFactory.BLOCK.create(new Identifier("copper_golem", name));
+        static TagKey<Block> register(String name) {
+            return TagKey.of(Registry.BLOCK_KEY, new Identifier("copper_golem", name));
         }
     }
 }
