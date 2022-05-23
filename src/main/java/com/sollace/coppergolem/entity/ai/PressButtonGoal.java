@@ -59,13 +59,13 @@ public class PressButtonGoal extends Goal {
         }
 
         target = entity.getFinder(maxDistance).pickAny(pos -> {
-           Path path = entity.getNavigation().findPathTo(pos, 1);
-           if (path == null || path.getLength() == 1 || recentlyVisited(pos)) {
-               return false;
-           }
+            Path path = entity.getNavigation().findPathTo(pos, 1);
+            if (path == null || path.getLength() == 1 || recentlyVisited(pos)) {
+                return false;
+            }
 
-           entity.getNavigation().startMovingAlong(path, getWalkSpeedTo(path.getTarget()));
-           return true;
+            entity.getNavigation().startMovingAlong(path, getWalkSpeedTo(path.getTarget()));
+            return true;
         });
     }
 

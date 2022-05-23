@@ -9,7 +9,7 @@ public interface MemoizeRegistries {
     HoneycombRegistry HONEYCOMB = new HoneycombRegistry();
 
     final class OxidizableRegistry extends MemoizeBackedRegistry {
-        protected OxidizableRegistry() {
+        private OxidizableRegistry() {
             super(() -> Oxidizable.OXIDATION_LEVEL_INCREASES);
         }
 
@@ -21,7 +21,7 @@ public interface MemoizeRegistries {
     }
 
     final class HoneycombRegistry extends MemoizeBackedRegistry {
-        protected HoneycombRegistry() {
+        private HoneycombRegistry() {
             super(() -> HoneycombItem.UNWAXED_TO_WAXED_BLOCKS);
         }
 

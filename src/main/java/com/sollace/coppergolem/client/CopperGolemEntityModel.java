@@ -36,7 +36,7 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
         this.leftArm = body.getChild(EntityModelPartNames.LEFT_ARM);
         this.rightLeg = root.getChild(EntityModelPartNames.RIGHT_LEG);
         this.leftLeg = root.getChild(EntityModelPartNames.LEFT_LEG);
-     }
+    }
 
     public static TexturedModelData getTexturedModelData() {
         ModelData data = new ModelData();
@@ -106,8 +106,8 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
             leftLeg.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
 
             if (entity.isChasing()) {
-                rightArm.pitch = 1.25F + (float)MathHelper.sin(animationProgress / 2) / 10F;
-                leftArm.pitch = 1.25F + (float)MathHelper.cos(animationProgress / 2) / 10F;
+                rightArm.pitch = 1.25F + MathHelper.sin(animationProgress / 2) / 10F;
+                leftArm.pitch = 1.25F + MathHelper.cos(animationProgress / 2) / 10F;
             } else {
                 rightArm.pitch = 1.5F * MathHelper.wrap(limbAngle, 13) * limbDistance;
                 rightArm.yaw = -0.5F * MathHelper.wrap(limbAngle, 13) * limbDistance;

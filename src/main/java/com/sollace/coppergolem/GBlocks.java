@@ -51,7 +51,7 @@ public interface GBlocks {
         MemoizeRegistries.HONEYCOMB.register(COPPER_BUTTON, WAXED_COPPER_BUTTON);
     }
 
-    public interface Tags {
+    interface Tags {
         TagKey<Block> COPPER_GOLEM_MATERIALS = register("copper_golem_materials");
         TagKey<Block> COPPER_BUTTONS = register("copper_buttons");
 

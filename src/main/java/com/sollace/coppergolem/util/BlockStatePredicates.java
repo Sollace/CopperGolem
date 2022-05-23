@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 
 public interface BlockStatePredicates {
 
-    public static Predicate<BlockState> forTag(TagKey<Block> tag) {
+    static Predicate<BlockState> forTag(TagKey<Block> tag) {
         return state -> state.isIn(tag);
     }
 }

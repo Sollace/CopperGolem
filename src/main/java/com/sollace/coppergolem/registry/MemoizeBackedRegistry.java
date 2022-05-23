@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+
 import com.sollace.coppergolem.Main;
 
 import java.util.function.Supplier;

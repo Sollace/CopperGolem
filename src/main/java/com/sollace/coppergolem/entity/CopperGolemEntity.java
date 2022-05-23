@@ -51,8 +51,8 @@ import com.sollace.coppergolem.GBlocks;
 import com.sollace.coppergolem.GItems;
 import com.sollace.coppergolem.GSounds;
 import com.sollace.coppergolem.entity.ai.BlockInteraction;
-import com.sollace.coppergolem.entity.ai.PressButtonGoal;
 import com.sollace.coppergolem.entity.ai.ChaseTargetGoal;
+import com.sollace.coppergolem.entity.ai.PressButtonGoal;
 import com.sollace.coppergolem.entity.ai.VariantSpeedEscapeDangerGoal;
 import com.sollace.coppergolem.entity.ai.VariantSpeedWanderAroundFarGoal;
 import com.sollace.coppergolem.util.BlockStatePredicates;
@@ -252,7 +252,7 @@ public class CopperGolemEntity extends GolemEntity {
         inanimate = isImmobile();
 
         if (inanimate) {
-            if (!getPosing().isPresent() && !world.isClient) {
+            if (getPosing().isEmpty() && !world.isClient) {
                 setPosing(Optional.of(storeAngles()));
             }
 
@@ -423,35 +423,35 @@ public class CopperGolemEntity extends GolemEntity {
 
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
-       super.writeCustomDataToNbt(nbt);
-       nbt.putInt("oxidation", getOxidation());
-       nbt.putBoolean("waxed", waxed);
+        super.writeCustomDataToNbt(nbt);
+        nbt.putInt("oxidation", getOxidation());
+        nbt.putBoolean("waxed", waxed);
 
-       NbtCompound modules = new NbtCompound();
-       finders.forEach((block, module) -> {
-           modules.put(block.toString(), module.toNbt());
-       });
-       nbt.put("interactionMemories", modules);
-       getPosing().ifPresent(posing -> nbt.put("posing", posing));
+        NbtCompound modules = new NbtCompound();
+        finders.forEach((block, module) -> {
+            modules.put(block.toString(), module.toNbt());
+        });
+        nbt.put("interactionMemories", modules);
+        getPosing().ifPresent(posing -> nbt.put("posing", posing));
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
-       super.readCustomDataFromNbt(nbt);
-       setOxidation(nbt.getInt("oxidation"));
-       waxed = nbt.getBoolean("waxed");
+        super.readCustomDataFromNbt(nbt);
+        setOxidation(nbt.getInt("oxidation"));
+        waxed = nbt.getBoolean("waxed");
 
-       finders.clear();
-       NbtCompound modules = nbt.getCompound("interactionMemories");
-       modules.getKeys().forEach(block -> {
-          Identifier id = Identifier.tryParse(block);
-          if (id != null) {
-              finders.put(id, BlockInteraction.fromNbt(this, modules.getCompound(block)));
-          }
-       });
-       setPosing(nbt.contains("posing") ? Optional.of(nbt.getCompound("posing")) : Optional.empty());
+        finders.clear();
+        NbtCompound modules = nbt.getCompound("interactionMemories");
+        modules.getKeys().forEach(block -> {
+            Identifier id = Identifier.tryParse(block);
+            if (id != null) {
+                finders.put(id, BlockInteraction.fromNbt(this, modules.getCompound(block)));
+            }
+        });
+        setPosing(nbt.contains("posing") ? Optional.of(nbt.getCompound("posing")) : Optional.empty());
 
-       getPosing().ifPresent(this::loadAngles);
+        getPosing().ifPresent(this::loadAngles);
     }
 
     @Override
@@ -463,18 +463,18 @@ public class CopperGolemEntity extends GolemEntity {
         } else if (status == WAX_OFF_STATUS) {
             produceParticles(ParticleTypes.WAX_OFF);
         } else {
-           super.handleStatus(status);
+            super.handleStatus(status);
         }
     }
 
     protected void produceParticles(ParticleEffect parameters) {
         for (int i = 0; i < 5; ++i) {
-           world.addParticle(parameters,
-                   getParticleX(1), getRandomBodyY() + 1, getParticleZ(1),
-                   random.nextGaussian() * 0.02,
-                   random.nextGaussian() * 0.02,
-                   random.nextGaussian() * 0.02
-           );
+            world.addParticle(parameters,
+                    getParticleX(1), getRandomBodyY() + 1, getParticleZ(1),
+                    random.nextGaussian() * 0.02,
+                    random.nextGaussian() * 0.02,
+                    random.nextGaussian() * 0.02
+            );
         }
     }
 
@@ -485,7 +485,7 @@ public class CopperGolemEntity extends GolemEntity {
 
     @Nullable
     protected SoundEvent getAmbientSound() {
-       return null;
+        return null;
     }
 
     @Override

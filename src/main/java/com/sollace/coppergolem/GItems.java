@@ -25,7 +25,7 @@ public interface GItems {
 
     static void bootstrap() {}
 
-    public interface Tags {
+    interface Tags {
         TagKey<Item> COPPER_GOLEM_CAN_PICK_UP = register("copper_golem_can_pick_up");
 
         static TagKey<Item> register(String name) {

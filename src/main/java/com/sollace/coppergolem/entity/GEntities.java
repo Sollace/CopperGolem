@@ -9,7 +9,7 @@ import net.minecraft.util.registry.Registry;
 
 public interface GEntities {
 
-    static EntityType<CopperGolemEntity> COPPER_GOLEM = register("copper_golem", EntityType.Builder.create(CopperGolemEntity::new, SpawnGroup.CREATURE)
+    EntityType<CopperGolemEntity> COPPER_GOLEM = register("copper_golem", EntityType.Builder.create(CopperGolemEntity::new, SpawnGroup.CREATURE)
             .makeFireImmune()
             .setDimensions(0.6F, 0.99F));
 
@@ -17,7 +17,7 @@ public interface GEntities {
         return Registry.register(Registry.ENTITY_TYPE, new Identifier("copper_golem", name), builder.build(name));
     }
 
-    public static void bootstrap() {
+    static void bootstrap() {
         FabricDefaultAttributeRegistry.register(COPPER_GOLEM, CopperGolemEntity.createMobAttributes());
     }
 }
