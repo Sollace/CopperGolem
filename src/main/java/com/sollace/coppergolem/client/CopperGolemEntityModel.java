@@ -89,7 +89,11 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
         head.yaw = headYaw * 0.017453292F + MathHelper.lerp(headSpinTime, 0, maxRotation);
         head.pitch = headSpinTime > 0 ? 0 : -headPitch * 0.017453292F;
 
-        body.pitch = -MathHelper.lerp(handSwingProgress, 0, 0.25F);
+        handSwingProgress *= Math.PI;
+
+        float sinAngle = (float)Math.sin(handSwingProgress);
+
+        body.pitch = -MathHelper.clamp(sinAngle, 0, 0.25F);
 
         if (riding) {
             rightLeg.pitch = 1.5F;
@@ -101,9 +105,9 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
             leftArm.pitch = 1.25F + 1.125F * MathHelper.wrap(limbAngle, 13) * limbDistance;
         } else {
             rightLeg.yaw = 0;
-            rightLeg.pitch = -1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+            rightLeg.pitch = MathHelper.cos(limbAngle * 0.6662F) * 1.4F * limbDistance;
             leftLeg.yaw = 0;
-            leftLeg.pitch = 1.5F * MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
+            leftLeg.pitch = MathHelper.cos(limbAngle * 0.6662F + (float)Math.PI) * 1.4F * limbDistance;
 
             if (entity.isChasing()) {
                 rightArm.pitch = 1.25F + MathHelper.sin(animationProgress / 2) / 10F;
@@ -117,11 +121,16 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
         }
 
         if (!entity.getStackInHand(Hand.MAIN_HAND).isEmpty()) {
-            rightArm.pitch = 0.5F - MathHelper.lerp(handSwingProgress, 0, 1.5F);
+            rightArm.pitch = 0.5F - MathHelper.clamp(sinAngle, 0, 1.5F);
         } else {
-            rightArm.pitch += MathHelper.lerp(handSwingProgress, 0, 1.5F);
-            leftArm.pitch += MathHelper.lerp(handSwingProgress, 0, 1.5F);
+            rightArm.pitch += MathHelper.clamp(sinAngle, 0, 1.5F);
+            leftArm.pitch += MathHelper.clamp(sinAngle, 0, 1.5F);
         }
+
+        float flailAmount = MathHelper.clamp((float)entity.getVelocity().y, 0, 0.5F);
+
+        leftArm.roll = flailAmount;
+        rightArm.roll = -flailAmount;
 
         if (!entity.isWigglingNose()) {
             nose.roll = 0;
