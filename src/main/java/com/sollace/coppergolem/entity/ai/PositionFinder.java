@@ -40,7 +40,7 @@ public abstract class PositionFinder {
     }
 
     public Optional<BlockPos> pickAny(Predicate<BlockPos> filter) {
-        List<BlockPos> positions = findPositions().collect(Collectors.toList());
+        List<BlockPos> positions = findPositions().limit(7).collect(Collectors.toList());
 
         while (!positions.isEmpty()) {
             BlockPos pick = positions.remove(entity.getRandom().nextInt(positions.size()));
@@ -53,8 +53,9 @@ public abstract class PositionFinder {
         return Optional.empty();
     }
 
+    @SuppressWarnings("deprecation")
     private Stream<BlockPos> findPositions() {
-        knownPositions.removeIf(p -> !entity.getEntityWorld().isChunkLoaded(p.getX(), p.getZ()) || !isValid(toState(p)));
+        knownPositions.removeIf(p -> !entity.getEntityWorld().isChunkLoaded(p) || !isValid(toState(p)));
 
         if (scanCounter-- <= 0) {
             scanCounter = MAX_SCAN_TICKS;

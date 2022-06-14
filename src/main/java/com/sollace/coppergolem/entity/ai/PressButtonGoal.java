@@ -1,8 +1,10 @@
 package com.sollace.coppergolem.entity.ai;
 
+import net.minecraft.command.argument.EntityAnchorArgumentType.EntityAnchor;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 
 import com.sollace.coppergolem.entity.CopperGolemEntity;
 
@@ -60,7 +62,7 @@ public class PressButtonGoal extends Goal {
 
         target = entity.getFinder(maxDistance).pickAny(pos -> {
             Path path = entity.getNavigation().findPathTo(pos, 1);
-            if (path == null || path.getLength() == 1 || recentlyVisited(pos)) {
+            if (path == null || recentlyVisited(pos)) {
                 return false;
             }
 
@@ -78,11 +80,11 @@ public class PressButtonGoal extends Goal {
     protected double getWalkSpeedTo(BlockPos pos) {
         double distance = entity.getBlockPos().getSquaredDistance(pos);
 
-        if (distance < 5) {
+        if (distance < 2) {
             return entity.getMovementSpeed() * 0.8;
         }
 
-        return entity.getMovementSpeed();
+        return entity.getMovementSpeed() * 1.3;
     }
 
     public void tick() {
@@ -96,14 +98,20 @@ public class PressButtonGoal extends Goal {
             target.map(finder::toState).filter(finder::isValid).ifPresentOrElse(state -> {
                 entity.getNavigation().setSpeed(getWalkSpeedTo(pos));
                 entity.getLookControl().lookAt(pos.getX(), pos.getY(), pos.getZ());
+                entity.lookAt(EntityAnchor.FEET, new Vec3d(pos.getX(), pos.getY(), pos.getZ()));
 
-                if (entity.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) < 2) {
+                if (entity.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) < 1) {
                     if (finder.perform(entity, pos, state)) {
                         BlockPos entityPos = entity.getBlockPos();
 
                         entity.setReachDirection(entityPos.getY() < pos.getY() ? CopperGolemEntity.REACHING_UP : CopperGolemEntity.REACHING_DOWN);
                     }
                     stop();
+                } else {
+                    Path path = entity.getNavigation().findPathTo(pos, 1);
+                    if (path != null) {
+                        entity.getNavigation().startMovingAlong(path, getWalkSpeedTo(path.getTarget()));
+                    }
                 }
             }, () -> {
                 entity.expressDissappointment();
