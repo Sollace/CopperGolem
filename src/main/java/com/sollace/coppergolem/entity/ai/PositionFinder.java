@@ -68,9 +68,10 @@ public abstract class PositionFinder {
     }
 
     protected Stream<BlockPos> searchArea(int range) {
+        @SuppressWarnings("deprecation")
         var stream = BlockPos.streamOutwards(entity.getBlockPos(), range, range, range)
                 .filter(this::isExposed)
-                .filter(p -> entity.getEntityWorld().isChunkLoaded(p.getX(), p.getZ()) && isValid(toState(p)));
+                .filter(p -> entity.getEntityWorld().isChunkLoaded(p) && isValid(toState(p)));
 
         if (minWalkDistance > 0) {
             stream = stream.filter(p -> knownPositions.stream().noneMatch(i -> p.isWithinDistance(p, minWalkDistance)));
