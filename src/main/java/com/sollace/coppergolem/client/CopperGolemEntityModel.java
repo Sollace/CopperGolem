@@ -117,7 +117,7 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
         }
 
         if (!entity.getStackInHand(Hand.MAIN_HAND).isEmpty()) {
-            leftArm.pitch = 0.5F - MathHelper.lerp(handSwingProgress, 0, 1.5F);
+            rightArm.pitch = 0.5F - MathHelper.lerp(handSwingProgress, 0, 1.5F);
         } else {
             rightArm.pitch += MathHelper.lerp(handSwingProgress, 0, 1.5F);
             leftArm.pitch += MathHelper.lerp(handSwingProgress, 0, 1.5F);
