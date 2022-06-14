@@ -6,7 +6,8 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "MixinAbstractButtonBlock",
-    "MixinMobEntity"
+    "MixinMobEntity",
+    "MixinServerWorld"
   ],
   "client": []
 }
