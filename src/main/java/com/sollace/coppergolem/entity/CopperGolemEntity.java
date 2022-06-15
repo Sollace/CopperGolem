@@ -52,6 +52,8 @@ import com.sollace.coppergolem.GItems;
 import com.sollace.coppergolem.GSounds;
 import com.sollace.coppergolem.entity.ai.BlockInteraction;
 import com.sollace.coppergolem.entity.ai.ChaseTargetGoal;
+import com.sollace.coppergolem.entity.ai.LearnedDuties;
+import com.sollace.coppergolem.entity.ai.MineBlockGoal;
 import com.sollace.coppergolem.entity.ai.PressButtonGoal;
 import com.sollace.coppergolem.entity.ai.VariantSpeedEscapeDangerGoal;
 import com.sollace.coppergolem.entity.ai.VariantSpeedWanderAroundFarGoal;
@@ -90,9 +92,13 @@ public class CopperGolemEntity extends GolemEntity {
     protected boolean waxed;
     public boolean inanimate;
 
+    private int prevReachingTicks;
     private int reachingTicks;
 
     private final Map<Identifier, BlockInteraction> finders = new HashMap<>();
+
+    @Nullable
+    private MineBlockGoal miningGoal;
 
     CopperGolemEntity(EntityType<CopperGolemEntity> type, World world) {
         super(type, world);
@@ -100,7 +106,9 @@ public class CopperGolemEntity extends GolemEntity {
 
     @Override
     protected void initGoals() {
+        miningGoal = new MineBlockGoal(this);
         goalSelector.add(1, new ChaseTargetGoal(this));
+        goalSelector.add(2, miningGoal);
         goalSelector.add(2, new VariantSpeedEscapeDangerGoal(this));
         goalSelector.add(2, new PressButtonGoal(this, 14, 30));
         goalSelector.add(3, new VariantSpeedWanderAroundFarGoal(this));
@@ -120,15 +128,32 @@ public class CopperGolemEntity extends GolemEntity {
         dataTracker.startTracking(POSING, new NbtCompound());
     }
 
+    public void teachInteraction(ItemStack stack, BlockState state, LearnedDuties.Duty duty) {
+        BlockInteraction interaction = finders.computeIfAbsent(Registry.ITEM.getId(stack.getItem()), id -> {
+            return BlockInteraction.create(this, 14);
+        });
+
+        if (interaction instanceof LearnedDuties.Receiver r) {
+            r.learn(state, duty);
+            wiggleNose();
+            spinHead();
+            setReachDirection(REACHING_UP);
+        }
+    }
+
+    public void startMining(BlockState state, BlockPos pos) {
+        miningGoal.startMining(state, pos);
+    }
+
     public BlockInteraction getFinder(int maxDistance) {
-        return finders.computeIfAbsent(Registry.ITEM.getId(getStackInHand(Hand.MAIN_HAND).getItem()), id -> {
+        return finders.computeIfAbsent(Registry.ITEM.getId(getMainHandStack().getItem()), id -> {
             return BlockInteraction.create(this, maxDistance);
         });
     }
 
     @Override
     public boolean canPickupItem(ItemStack stack) {
-        ItemStack current = this.getStackInHand(Hand.MAIN_HAND);
+        ItemStack current = getMainHandStack();
 
         if (!current.isEmpty() && ItemStack.canCombine(current, stack)) {
             return true;
@@ -186,6 +211,10 @@ public class CopperGolemEntity extends GolemEntity {
 
     public byte getReachDirection() {
         return dataTracker.get(REACH_DIRECTION);
+    }
+
+    public float getReachAmount(float tickDelta) {
+        return MathHelper.lerp(tickDelta, prevReachingTicks, reachingTicks);
     }
 
     public void setReachDirection(byte direction) {
@@ -246,6 +275,10 @@ public class CopperGolemEntity extends GolemEntity {
         return inanimate;
     }
 
+    public boolean isPreoccupied() {
+        return miningGoal == null || miningGoal.canStart() || getHeadSpinTime() > 0;
+    }
+
     @Override
     public void tick() {
 
@@ -264,6 +297,11 @@ public class CopperGolemEntity extends GolemEntity {
                 setPosing(Optional.empty());
             }
 
+            if (world.isClient && reachingTicks == 0 && getReachDirection() != REACHING_NONE) {
+                reachingTicks = 9;
+            }
+
+            prevReachingTicks = reachingTicks;
             if (reachingTicks > 0) {
                 if (--reachingTicks == 0) {
                     setReachDirection(REACHING_NONE);

@@ -14,8 +14,10 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.GameRules;
 
 import com.sollace.coppergolem.entity.CopperGolemEntity;
+import com.sollace.coppergolem.entity.ai.LearnedDuties.Duty;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -28,7 +30,8 @@ import java.util.stream.Stream;
  * - If there are no known working blocks, goes back to searching
  * - Any further blocks found to work get added to it's memory
  */
-class UseItemInteraction extends BlockInteraction {
+class UseItemInteraction extends BlockInteraction implements LearnedDuties.Receiver {
+    private final LearnedDuties learnedDuties = new LearnedDuties();
     private final Set<Identifier> matchingBlocks = new HashSet<>();
     private final Set<Identifier> nonMatchingBlocks = new HashSet<>();
 
@@ -37,14 +40,34 @@ class UseItemInteraction extends BlockInteraction {
     }
 
     @Override
+    public void learn(BlockState state, Duty duty) {
+        learnedDuties.learn(state, duty);
+    }
+
+    @Override
     public boolean perform(CopperGolemEntity entity, BlockPos pos, BlockState state) {
         ItemStack stack = entity.getStackInHand(Hand.MAIN_HAND);
+
+        if (!entity.world.getGameRules().get(GameRules.DO_MOB_GRIEFING).get()) {
+            return false;
+        }
 
         if (stack.getItem() instanceof BlockItem) {
             return false;
         }
 
-        ActionResult result = stack.useOnBlock(new AutomaticItemPlacementContext(entity.getEntityWorld(), pos, entity.getHorizontalFacing(), stack, Direction.UP));
+        LearnedDuties.Duty duty = learnedDuties.getDuty(state, entity.getRandom()).orElse(Duty.RIGHT_CLICK);
+
+        ActionResult result;
+        switch (duty) {
+            case LEFT_CLICK:
+                entity.swingHand(Hand.MAIN_HAND);
+                entity.startMining(state, pos);
+                result = ActionResult.SUCCESS;
+                break;
+            default:
+                result = stack.useOnBlock(new AutomaticItemPlacementContext(entity.getEntityWorld(), pos, entity.getHorizontalFacing(), stack, Direction.UP));
+        }
 
         if (result.shouldSwingHand()) {
             entity.swingHand(Hand.MAIN_HAND);
@@ -69,6 +92,10 @@ class UseItemInteraction extends BlockInteraction {
     @Override
     public boolean isValid(BlockState state) {
 
+        if (learnedDuties.isKnown(state)) {
+            return true;
+        }
+
         Identifier id = Registry.BLOCK.getId(state.getBlock());
 
         if (state.isAir() || nonMatchingBlocks.contains(id)) {
@@ -92,6 +119,9 @@ class UseItemInteraction extends BlockInteraction {
         super.readNbt(tag);
         readSet(matchingBlocks, tag.getList("matching", NbtElement.STRING_TYPE));
         readSet(nonMatchingBlocks, tag.getList("nonmatching", NbtElement.STRING_TYPE));
+        if (tag.contains("learnedDuties", NbtElement.COMPOUND_TYPE)) {
+            learnedDuties.readNbt(tag.getCompound("learnedDuties"));
+        }
     }
 
     @Override
@@ -99,6 +129,9 @@ class UseItemInteraction extends BlockInteraction {
         super.writeNbt(tag);
         tag.put("matching", writeSet(matchingBlocks));
         tag.put("nonmatching", writeSet(nonMatchingBlocks));
+        NbtCompound duties = new NbtCompound();
+        learnedDuties.writeNbt(duties);
+        tag.put("learnedDuties", duties);
     }
 
     private static NbtList writeSet(Set<Identifier> set) {

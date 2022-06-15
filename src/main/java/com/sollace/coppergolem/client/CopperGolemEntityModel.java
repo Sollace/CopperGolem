@@ -121,16 +121,22 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
         }
 
         if (!entity.getStackInHand(Hand.MAIN_HAND).isEmpty()) {
-            rightArm.pitch = 0.5F - MathHelper.clamp(sinAngle, 0, 1.5F);
+            rightArm.pitch += 0.5F - MathHelper.clamp(sinAngle, 0, 1.5F);
         } else {
             rightArm.pitch += MathHelper.clamp(sinAngle, 0, 1.5F);
             leftArm.pitch += MathHelper.clamp(sinAngle, 0, 1.5F);
         }
 
         float flailAmount = MathHelper.clamp((float)entity.getVelocity().y, 0, 0.5F);
-
-        leftArm.roll = flailAmount;
-        rightArm.roll = -flailAmount;
+        if (entity.getReachDirection() == CopperGolemEntity.REACHING_UP) {
+            float amount = entity.getReachAmount(animationProgress);
+            flailAmount = (float)Math.sin(amount / 9F * Math.PI);
+            leftArm.pitch = flailAmount;
+            rightArm.pitch = flailAmount;
+        } else {
+            leftArm.roll = flailAmount;
+            rightArm.roll = -flailAmount;
+        }
 
         if (!entity.isWigglingNose()) {
             nose.roll = 0;

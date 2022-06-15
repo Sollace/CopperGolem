@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.sollace.coppergolem.entity.LightningAttractionUtil;
+import com.sollace.coppergolem.entity.CopperGolemUtil;
 
 import java.util.Optional;
 
@@ -17,7 +17,7 @@ public class MixinServerWorld {
     @Inject(method = "getLightningRodPos", at = @At("HEAD"), cancellable = true)
     private void getLightningRodPos(BlockPos pos, CallbackInfoReturnable<Optional<BlockPos>> info) {
         ServerWorld self = (ServerWorld)(Object)this;
-        Optional<BlockPos> p = LightningAttractionUtil.getGolemAtPos(self, pos);
+        Optional<BlockPos> p = CopperGolemUtil.getGolemAtPos(self, pos);
         if (p.isPresent()) {
             info.setReturnValue(p);
         }

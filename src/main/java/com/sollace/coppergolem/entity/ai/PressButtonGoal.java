@@ -4,6 +4,7 @@ import net.minecraft.command.argument.EntityAnchorArgumentType.EntityAnchor;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
 import com.sollace.coppergolem.entity.CopperGolemEntity;
@@ -37,26 +38,26 @@ public class PressButtonGoal extends Goal {
     @Override
     public boolean canStart() {
 
-        if (entity.getHeadSpinTime() > 0) {
+        if (entity.isPreoccupied()) {
             return false;
         }
 
         if (idleTicks-- > 0) {
             return false;
         }
-        idleTicks = maxIdleTicks;
+        idleTicks = MathHelper.clamp(entity.getRandom().nextInt(maxIdleTicks / 2), 2, maxIdleTicks);
 
         return entity.getNavigation().isIdle();
     }
 
     @Override
     public boolean shouldContinue() {
-        return entity.getHeadSpinTime() <= 0 && entity.getNavigation().isFollowingPath();
+        return !entity.isPreoccupied() && entity.getNavigation().isFollowingPath();
     }
 
     @Override
     public void start() {
-        if (entity.getHeadSpinTime() > 0) {
+        if (entity.isPreoccupied()) {
             return;
         }
 
@@ -88,7 +89,7 @@ public class PressButtonGoal extends Goal {
     }
 
     public void tick() {
-        if (entity.getHeadSpinTime() > 0) {
+        if (entity.isPreoccupied()) {
             return;
         }
 
@@ -100,7 +101,7 @@ public class PressButtonGoal extends Goal {
                 entity.getLookControl().lookAt(pos.getX(), pos.getY(), pos.getZ());
                 entity.lookAt(EntityAnchor.FEET, new Vec3d(pos.getX(), pos.getY(), pos.getZ()));
 
-                if (entity.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) < 1) {
+                if (entity.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) < 2) {
                     if (finder.perform(entity, pos, state)) {
                         BlockPos entityPos = entity.getBlockPos();
 
