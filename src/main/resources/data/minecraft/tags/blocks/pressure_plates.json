@@ -1,8 +1,5 @@
 {
-  "replace": false,
   "values": [
-    "#copper_golem:copper_buttons",
-    "#copper_golem:waxed_copper_buttons",
     "#copper_golem:copper_pressure_plates",
     "#copper_golem:waxed_copper_pressure_plates"
   ]

@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "copper_golem:copper_pressure_plate",
+    "copper_golem:exposed_copper_pressure_plate",
+    "copper_golem:weathered_copper_pressure_plate",
+    "copper_golem:oxidized_copper_pressure_plate"
+  ]
+}

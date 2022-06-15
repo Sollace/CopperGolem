@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "waxed_copper_block",
+  "ingredients": [
+    {
+      "item": "copper_golem:weathered_copper_pressure_plate"
+    },
+    {
+      "item": "minecraft:honeycomb"
+    }
+  ],
+  "result": {
+    "item": "copper_golem:waxed_weathered_copper_pressure_plate"
+  }
+}

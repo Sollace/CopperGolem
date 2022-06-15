@@ -9,6 +9,16 @@
   "block.copper_golem.waxed_exposed_copper_button": "Waxed Exposed Copper Button",
   "block.copper_golem.waxed_copper_button": "Waxed Copper Button",
 
+  "block.copper_golem.oxidized_copper_pressure_plate": "Oxidized Copper Pressure Plate",
+  "block.copper_golem.weathered_copper_pressure_plate": "Weathered Copper Pressure Plate",
+  "block.copper_golem.exposed_copper_pressure_plate": "Exposed Copper Pressure Plate",
+  "block.copper_golem.copper_pressure_plate": "Copper Pressure Plate",
+
+  "block.copper_golem.waxed_oxidized_copper_pressure_plate": "Waxed Oxidized Copper Pressure Plate",
+  "block.copper_golem.waxed_weathered_copper_pressure_plate": "Waxed Weathered Copper Pressure Plate",
+  "block.copper_golem.waxed_exposed_copper_pressure_plate": "Waxed Exposed Copper Pressure Plate",
+  "block.copper_golem.waxed_copper_pressure_plate": "Waxed Copper Pressure Plate",
+
   "entity.copper_golem.copper_golem": "Copper Golem",
 
   "subtitles.entity.copper_golem.step": "Footsteps",

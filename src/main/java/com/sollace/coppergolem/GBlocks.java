@@ -5,6 +5,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.Material;
 import net.minecraft.block.Oxidizable;
+import net.minecraft.block.PressurePlateBlock.ActivationRule;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
@@ -12,43 +13,59 @@ import net.minecraft.util.registry.Registry;
 
 import com.sollace.coppergolem.registry.MemoizeRegistries;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
 public interface GBlocks {
-    Block OXIDIZED_COPPER_BUTTON = register("oxidized_copper_button",
-            new OxidizableCopperButtonBlock(Oxidizable.OxidationLevel.OXIDIZED, AbstractBlock.Settings.of(Material.METAL, MapColor.TEAL).requiresTool().strength(3, 6).sounds(BlockSoundGroup.COPPER))
-    );
-    Block WEATHERED_COPPER_BUTTON = register("weathered_copper_button",
-            new OxidizableCopperButtonBlock(Oxidizable.OxidationLevel.WEATHERED, AbstractBlock.Settings.of(Material.METAL, MapColor.DARK_AQUA).requiresTool().strength(3, 6).sounds(BlockSoundGroup.COPPER))
-    );
-    Block EXPOSED_COPPER_BUTTON = register("exposed_copper_button",
-            new OxidizableCopperButtonBlock(Oxidizable.OxidationLevel.EXPOSED, AbstractBlock.Settings.of(Material.METAL, MapColor.TERRACOTTA_LIGHT_GRAY).requiresTool().strength(3, 6).sounds(BlockSoundGroup.COPPER))
-    );
-    Block COPPER_BUTTON = register("copper_button",
-            new OxidizableCopperButtonBlock(Oxidizable.OxidationLevel.UNAFFECTED, AbstractBlock.Settings.of(Material.METAL, MapColor.ORANGE).requiresTool().strength(3, 6).sounds(BlockSoundGroup.COPPER))
-    );
+    List<List<Map.Entry<String, Block>>> COPPER_BLOCKS = new ArrayList<>();
 
-    Block WAXED_OXIDIZED_COPPER_BUTTON = register("waxed_oxidized_copper_button",
-            new CopperButtonBlock(Oxidizable.OxidationLevel.OXIDIZED, AbstractBlock.Settings.copy(OXIDIZED_COPPER_BUTTON))
-    );
-    Block WAXED_WEATHERED_COPPER_BUTTON = register("waxed_weathered_copper_button",
-            new CopperButtonBlock(Oxidizable.OxidationLevel.WEATHERED, AbstractBlock.Settings.copy(WEATHERED_COPPER_BUTTON))
-    );
-    Block WAXED_EXPOSED_COPPER_BUTTON = register("waxed_exposed_copper_button",
-            new CopperButtonBlock(Oxidizable.OxidationLevel.EXPOSED, AbstractBlock.Settings.copy(EXPOSED_COPPER_BUTTON))
-    );
-    Block WAXED_COPPER_BUTTON = register("waxed_copper_button",
-            new CopperButtonBlock(Oxidizable.OxidationLevel.UNAFFECTED, AbstractBlock.Settings.copy(COPPER_BUTTON))
-    );
-
-    static <T extends Block> T register(String name, T block) {
+    static <T extends Block> T register(int setId, String name, T block) {
+        if (setId >= COPPER_BLOCKS.size()) {
+            COPPER_BLOCKS.add(new ArrayList<>());
+        }
+        COPPER_BLOCKS.get(setId).add(Map.entry(name, block));
         return Registry.register(Registry.BLOCK, new Identifier("copper_golem", name), block);
     }
 
     static void bootstrap() {
-        MemoizeRegistries.OXIDIZABLE.register(COPPER_BUTTON, EXPOSED_COPPER_BUTTON, WEATHERED_COPPER_BUTTON, OXIDIZED_COPPER_BUTTON);
-        MemoizeRegistries.HONEYCOMB.register(OXIDIZED_COPPER_BUTTON, WAXED_OXIDIZED_COPPER_BUTTON);
-        MemoizeRegistries.HONEYCOMB.register(WEATHERED_COPPER_BUTTON, WAXED_WEATHERED_COPPER_BUTTON);
-        MemoizeRegistries.HONEYCOMB.register(EXPOSED_COPPER_BUTTON, WAXED_EXPOSED_COPPER_BUTTON);
-        MemoizeRegistries.HONEYCOMB.register(COPPER_BUTTON, WAXED_COPPER_BUTTON);
+        var set = List.of(
+            Map.entry(Oxidizable.OxidationLevel.UNAFFECTED, MapColor.ORANGE),
+            Map.entry(Oxidizable.OxidationLevel.EXPOSED, MapColor.TERRACOTTA_LIGHT_GRAY),
+            Map.entry(Oxidizable.OxidationLevel.WEATHERED, MapColor.DARK_AQUA),
+            Map.entry(Oxidizable.OxidationLevel.OXIDIZED, MapColor.TEAL)
+        );
+
+        // generate buttons
+        generateCopperBlocks(0, set, "button", o -> {
+            return new OxidizableCopperButtonBlock(o.getKey(), AbstractBlock.Settings.of(Material.METAL, o.getValue())
+                .requiresTool().strength(3, 6).sounds(BlockSoundGroup.COPPER));
+        }, (o, settings) -> {
+            return new CopperButtonBlock(o.getKey(), settings);
+        });
+
+        // generate pressure plates
+        generateCopperBlocks(2, set, "pressure_plate", o -> {
+            return new OxidizableCopperPressurePlateBlock(o.getKey(), ActivationRule.EVERYTHING, AbstractBlock.Settings.of(Material.METAL, o.getValue())
+                    .noCollision().requiresTool().strength(0.5F).sounds(BlockSoundGroup.COPPER));
+        }, (o, settings) -> {
+            return new CopperPressurePlateBlock(o.getKey(), ActivationRule.EVERYTHING, settings);
+        });
+    }
+
+    static <T extends Block> void generateCopperBlocks(int setId, List<Map.Entry<Oxidizable.OxidationLevel, MapColor>> types, String name,
+            Function<Map.Entry<Oxidizable.OxidationLevel, MapColor>, T> normalMapper,
+            BiFunction<Map.Entry<Oxidizable.OxidationLevel, MapColor>, AbstractBlock.Settings, T> waxedMapper) {
+
+        MemoizeRegistries.OXIDIZABLE.register(types.stream().map(o -> {
+            var id = o.getKey() == Oxidizable.OxidationLevel.UNAFFECTED ? "" : o.getKey().name().toLowerCase() + "_";
+            var normal = register(setId, id + "copper_" + name, normalMapper.apply(o));
+            var waxed = register(setId + 1, "waxed_" + id + "copper_" + name, waxedMapper.apply(o, AbstractBlock.Settings.copy(normal)));
+            MemoizeRegistries.HONEYCOMB.register(normal, waxed);
+            return normal;
+        }).toArray(Block[]::new));
     }
 
     interface Tags {

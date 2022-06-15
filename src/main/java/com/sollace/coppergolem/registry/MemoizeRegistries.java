@@ -13,6 +13,11 @@ public interface MemoizeRegistries {
             super(() -> Oxidizable.OXIDATION_LEVEL_INCREASES);
         }
 
+        public <T extends Block> T[] register(T[] stages) {
+            register(stages[0], stages[1], stages[2], stages[3]);
+            return stages;
+        }
+
         public void register(Block normal, Block exposed, Block weathered, Block oxidized) {
             getEntries().put(normal, exposed);
             getEntries().put(exposed, weathered);
