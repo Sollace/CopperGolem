@@ -13,6 +13,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.WorldEvents;
 
 import com.sollace.coppergolem.entity.CopperGolemEntity;
 
@@ -75,9 +76,10 @@ public class MineBlockGoal extends Goal {
                 return progress < 120;
             }
 
-            boolean canMine = !state.isToolRequired() || mob.getMainHandStack().isSuitableFor(state);
+            ItemStack item = mob.getMainHandStack();
+            boolean canMine = !state.isToolRequired() || item.isSuitableFor(state);
 
-            float breakingDelta = 1 / hardness / (canMine ? 100F : 30F);
+            float breakingDelta = mob.getMiningSpeed(state) / hardness / (canMine ? 30F : 100F);
 
             mob.getNavigation().stop();
 
@@ -101,6 +103,7 @@ public class MineBlockGoal extends Goal {
 
                 if (mob.world.getGameRules().get(GameRules.DO_MOB_GRIEFING).get()) {
                     PlayerEntity nearestPlayer = mob.world.getClosestPlayer(mob, 10);
+                    mob.world.syncWorldEvent(null, WorldEvents.BLOCK_BROKEN, pos, Block.getRawIdFromState(state));
                     if (nearestPlayer == null) {
                         mob.world.breakBlock(pos, canMine, mob);
                     } else {

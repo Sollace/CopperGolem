@@ -11,6 +11,7 @@ import net.minecraft.block.WallMountedBlock;
 import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.block.pattern.BlockPatternBuilder;
 import net.minecraft.block.pattern.CachedBlockPosition;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
@@ -22,6 +23,8 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.effect.StatusEffectUtil;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -35,6 +38,7 @@ import net.minecraft.predicate.block.BlockStatePredicate;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.tag.FluidTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -258,6 +262,35 @@ public class CopperGolemEntity extends GolemEntity {
     @Override
     public float getMovementSpeed() {
         return 0.3F / (1 + getDegradationLevel().ordinal());
+    }
+
+    public float getMiningSpeed(BlockState block) {
+        ItemStack heldItem = this.getMainHandStack();
+        float speed = heldItem.getMiningSpeedMultiplier(block) * 0.67F;
+        if (speed > 1) {
+            int efficiency = EnchantmentHelper.getEfficiency(this);
+            if (efficiency > 0 && !heldItem.isEmpty()) {
+                speed += (float)(efficiency * efficiency + 1);
+            }
+        }
+        if (StatusEffectUtil.hasHaste(this)) {
+            speed *= 1.0f + (float)(StatusEffectUtil.getHasteAmplifier(this) + 1) * 0.2f;
+        }
+        if (this.hasStatusEffect(StatusEffects.MINING_FATIGUE)) {
+            speed *= (switch (getStatusEffect(StatusEffects.MINING_FATIGUE).getAmplifier()) {
+                case 0 -> 0.3f;
+                case 1 -> 0.09f;
+                case 2 -> 0.0027f;
+                default -> 8.1E-4f;
+            });
+        }
+        if (isSubmergedIn(FluidTags.WATER) && !EnchantmentHelper.hasAquaAffinity(this)) {
+            speed /= 5F;
+        }
+        if (!onGround) {
+            speed /= 5F;
+        }
+        return speed;
     }
 
     @Override

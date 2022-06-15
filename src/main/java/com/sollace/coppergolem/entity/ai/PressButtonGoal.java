@@ -101,7 +101,7 @@ public class PressButtonGoal extends Goal {
                 entity.getLookControl().lookAt(pos.getX(), pos.getY(), pos.getZ());
                 entity.lookAt(EntityAnchor.FEET, new Vec3d(pos.getX(), pos.getY(), pos.getZ()));
 
-                if (entity.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) < 2) {
+                if (entity.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) < entity.getArmReach()) {
                     if (finder.perform(entity, pos, state)) {
                         BlockPos entityPos = entity.getBlockPos();
 
