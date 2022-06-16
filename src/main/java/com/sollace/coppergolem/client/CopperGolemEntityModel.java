@@ -27,6 +27,8 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
     private final ModelPart rightLeg;
     private final ModelPart leftLeg;
 
+    private float reachAmount;
+
     public CopperGolemEntityModel(ModelPart root) {
         this.root = root;
         this.body = root.getChild(EntityModelPartNames.BODY);
@@ -72,6 +74,12 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
     }
 
     @Override
+    public void animateModel(CopperGolemEntity entity, float limbAngle, float limbDistance, float tickDelta) {
+        float rm = (entity.getReachAmount(tickDelta) / 200F);
+        reachAmount = 1 - Math.min(1, (float)Math.sin(rm * Math.PI) * 12);
+    }
+
+    @Override
     public void setAngles(CopperGolemEntity entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
 
         if (entity.inanimate) {
@@ -88,12 +96,11 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
 
         head.yaw = headYaw * 0.017453292F + MathHelper.lerp(headSpinTime, 0, maxRotation);
         head.pitch = headSpinTime > 0 ? 0 : -headPitch * 0.017453292F;
+        head.roll = 0;
 
         handSwingProgress *= Math.PI;
 
         float sinAngle = (float)Math.sin(handSwingProgress);
-
-        body.pitch = -MathHelper.clamp(sinAngle, 0, 0.25F);
 
         if (riding) {
             rightLeg.pitch = 1.5F;
@@ -104,6 +111,8 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
             rightArm.pitch = 1.25F + 1.125F * MathHelper.wrap(limbAngle, 13) * limbDistance;
             leftArm.pitch = 1.25F + 1.125F * MathHelper.wrap(limbAngle, 13) * limbDistance;
         } else {
+            body.pitch = -MathHelper.clamp(sinAngle, 0, 0.25F);
+
             rightLeg.yaw = 0;
             rightLeg.pitch = MathHelper.cos(limbAngle * 0.6662F) * 1.4F * limbDistance;
             leftLeg.yaw = 0;
@@ -127,13 +136,31 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
             leftArm.pitch += MathHelper.clamp(sinAngle, 0, 1.5F);
         }
 
-        float flailAmount = MathHelper.clamp((float)entity.getVelocity().y, 0, 0.5F);
-        if (entity.getReachDirection() == CopperGolemEntity.REACHING_UP) {
-            float amount = entity.getReachAmount(animationProgress);
-            flailAmount = (float)Math.sin(amount / 9F * Math.PI);
-            leftArm.pitch = flailAmount;
-            rightArm.pitch = flailAmount;
+        if (reachAmount < 1) {
+            float ani = 1 - reachAmount;
+            float armReachAmnt = ani * 2.5F;
+            float wobble = ani * ((float)Math.sin(animationProgress / 9F) / 9F);
+
+            leftArm.pitch *= reachAmount;
+            leftArm.pitch += armReachAmnt + wobble;
+            rightArm.pitch *= reachAmount;
+            rightArm.pitch += armReachAmnt - wobble;
+            leftArm.roll *= reachAmount;
+            leftArm.roll += wobble;
+            rightArm.roll *= reachAmount;
+            rightArm.roll -= wobble;
+            head.pitch *= reachAmount;
+            head.pitch += ani * 0.8F;
+            head.roll *= reachAmount;
+            head.roll += ani * ((float)Math.cos(animationProgress / 9F) / 9F);
+
+            body.pitch *= reachAmount;
+            body.pitch += ani * 0.3F;
+            leftLeg.pitch *= reachAmount;
+            leftLeg.pitch -= ani * 0.1F;
         } else {
+            float flailAmount = MathHelper.clamp((float)entity.getVelocity().y, 0, 0.5F);
+
             leftArm.roll = flailAmount;
             rightArm.roll = -flailAmount;
         }

@@ -16,6 +16,15 @@ class ClickButtonInteraction extends BlockInteraction {
 
     @Override
     public boolean perform(CopperGolemEntity entity, BlockPos pos, BlockState state) {
+
+        if (pos.getY() > entity.getY()) {
+            if (pos.getY() > entity.getY() + 1) {
+                entity.setReachDirection(CopperGolemEntity.REACHING_UP);
+                entity.getNavigation().stop();
+                return false;
+            }
+        }
+
         entity.swingHand(Hand.MAIN_HAND);
 
         ((AbstractButtonBlock)state.getBlock()).powerOn(state, entity.getEntityWorld(), pos);

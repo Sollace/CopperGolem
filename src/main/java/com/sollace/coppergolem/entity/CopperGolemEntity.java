@@ -223,7 +223,7 @@ public class CopperGolemEntity extends GolemEntity {
 
     public void setReachDirection(byte direction) {
         dataTracker.set(REACH_DIRECTION, direction);
-        reachingTicks = direction == REACHING_NONE ? 0 : 9;
+        reachingTicks = direction == REACHING_NONE ? 0 : 200;
     }
 
     public boolean isChasing() {
@@ -235,7 +235,7 @@ public class CopperGolemEntity extends GolemEntity {
     }
 
     public double getArmReach() {
-        return getWidth() * 2 * getWidth() * 2;
+        return getWidth() * 2;
     }
 
     public boolean isWigglingNose() {
@@ -300,7 +300,10 @@ public class CopperGolemEntity extends GolemEntity {
 
     @Override
     protected boolean isImmobile() {
-        return super.isImmobile() || getDegradationLevel() == OxidationLevel.OXIDIZED;
+        return super.isImmobile()
+                || getDegradationLevel() == OxidationLevel.OXIDIZED
+                || getReachDirection() != REACHING_NONE
+                || (miningGoal != null && miningGoal.canStart());
     }
 
     @Override
@@ -309,13 +312,13 @@ public class CopperGolemEntity extends GolemEntity {
     }
 
     public boolean isPreoccupied() {
-        return miningGoal == null || miningGoal.canStart() || getHeadSpinTime() > 0;
+        return reachingTicks > 0 || (miningGoal != null && miningGoal.canStart()) || getHeadSpinTime() > 0;
     }
 
     @Override
     public void tick() {
 
-        inanimate = isImmobile();
+        inanimate = getDegradationLevel() == OxidationLevel.OXIDIZED;
 
         if (inanimate) {
             if (getPosing().isEmpty() && !world.isClient) {
@@ -331,14 +334,13 @@ public class CopperGolemEntity extends GolemEntity {
             }
 
             if (world.isClient && reachingTicks == 0 && getReachDirection() != REACHING_NONE) {
-                reachingTicks = 9;
+                setReachDirection(REACHING_NONE);
+                reachingTicks = 200;
             }
 
             prevReachingTicks = reachingTicks;
-            if (reachingTicks > 0) {
-                if (--reachingTicks == 0) {
-                    setReachDirection(REACHING_NONE);
-                }
+            if (reachingTicks > 0 && --reachingTicks == 0) {
+                setReachDirection(REACHING_NONE);
             }
 
             super.tick();

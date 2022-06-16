@@ -1,6 +1,5 @@
 package com.sollace.coppergolem.entity.ai;
 
-import net.minecraft.command.argument.EntityAnchorArgumentType.EntityAnchor;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.util.math.BlockPos;
@@ -67,7 +66,7 @@ public class PressButtonGoal extends Goal {
                 return false;
             }
 
-            entity.getNavigation().startMovingAlong(path, getWalkSpeedTo(path.getTarget()));
+            entity.getNavigation().startMovingAlong(path, getWalkSpeedTo(pos));
             return true;
         });
     }
@@ -98,20 +97,22 @@ public class PressButtonGoal extends Goal {
         target.ifPresent(pos -> {
             target.map(finder::toState).filter(finder::isValid).ifPresentOrElse(state -> {
                 entity.getNavigation().setSpeed(getWalkSpeedTo(pos));
-                entity.getLookControl().lookAt(pos.getX(), pos.getY(), pos.getZ());
-                entity.lookAt(EntityAnchor.FEET, new Vec3d(pos.getX(), pos.getY(), pos.getZ()));
+                Vec3d center = Vec3d.ofBottomCenter(pos);
+                entity.getLookControl().lookAt(center);
 
-                if (entity.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) < entity.getArmReach()) {
-                    if (finder.perform(entity, pos, state)) {
-                        BlockPos entityPos = entity.getBlockPos();
+                Vec3d targetPos = pos.getY() >= entity.getBlockPos().getY() + 1 ? new Vec3d(center.getX(), entity.getY() + 1, center.getZ()) : center;
 
-                        entity.setReachDirection(entityPos.getY() < pos.getY() ? CopperGolemEntity.REACHING_UP : CopperGolemEntity.REACHING_DOWN);
+                if (entity.squaredDistanceTo(targetPos) < entity.getArmReach()) {
+                    if (!finder.perform(entity, pos, state)) {
+                        entity.expressDissappointment();
                     }
                     stop();
                 } else {
                     Path path = entity.getNavigation().findPathTo(pos, 1);
                     if (path != null) {
                         entity.getNavigation().startMovingAlong(path, getWalkSpeedTo(path.getTarget()));
+                    } else {
+                        stop();
                     }
                 }
             }, () -> {

@@ -123,7 +123,6 @@ public class MineBlockGoal extends Goal {
                     }
                 }
                 mob.spinHead();
-                mob.setReachDirection(CopperGolemEntity.REACHING_UP);
                 return false;
             }
 
