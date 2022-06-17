@@ -1,12 +1,12 @@
 package com.sollace.coppergolem.client;
 
 import net.minecraft.block.Oxidizable.OxidationLevel;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory.Context;
 import net.minecraft.client.render.entity.MobEntityRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
+import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
@@ -24,7 +24,7 @@ public class CopperGolemEntityRenderer extends MobEntityRenderer<CopperGolemEnti
 
     public CopperGolemEntityRenderer(Context ctx) {
         super(ctx, new CopperGolemEntityModel(CopperGolemEntityModel.getTexturedModelData().createModel()), 0.3F);
-        addFeature(new HeldItem(this));
+        addFeature(new HeldItem(this, ctx.getHeldItemRenderer()));
     }
 
     @Override
@@ -33,8 +33,12 @@ public class CopperGolemEntityRenderer extends MobEntityRenderer<CopperGolemEnti
     }
 
     public static class HeldItem extends FeatureRenderer<CopperGolemEntity, CopperGolemEntityModel> {
-        public HeldItem(FeatureRendererContext<CopperGolemEntity, CopperGolemEntityModel> context) {
+
+        private final HeldItemRenderer heldItemRenderer;
+
+        public HeldItem(FeatureRendererContext<CopperGolemEntity, CopperGolemEntityModel> context, HeldItemRenderer heldItemRenderer) {
             super(context);
+            this.heldItemRenderer = heldItemRenderer;
         }
 
         @Override
@@ -55,7 +59,7 @@ public class CopperGolemEntityRenderer extends MobEntityRenderer<CopperGolemEnti
             boolean isLeft = true;
             matrices.translate((float)(isLeft ? -1 : 1) / 16F, 1 / 16F, 5 / 16F);
 
-            MinecraftClient.getInstance().getHeldItemRenderer().renderItem(entity, item, ModelTransformation.Mode.THIRD_PERSON_RIGHT_HAND, false, matrices, vertices, light);
+            heldItemRenderer.renderItem(entity, item, ModelTransformation.Mode.THIRD_PERSON_RIGHT_HAND, false, matrices, vertices, light);
             matrices.pop();
         }
     }
