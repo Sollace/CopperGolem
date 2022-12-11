@@ -5,7 +5,6 @@
   "refmap": "copper_golem.mixin.refmap.json",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "MixinAbstractButtonBlock",
     "MixinMobEntity",
     "MixinServerPlayerInteractionManager",
     "MixinServerWorld"

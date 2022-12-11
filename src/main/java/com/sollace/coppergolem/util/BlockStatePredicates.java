@@ -2,7 +2,7 @@ package com.sollace.coppergolem.util;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.tag.TagKey;
+import net.minecraft.registry.tag.TagKey;
 
 import java.util.function.Predicate;
 

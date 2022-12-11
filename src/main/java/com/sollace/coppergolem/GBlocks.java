@@ -1,5 +1,6 @@
 package com.sollace.coppergolem;
 
+import net.fabricmc.fabric.api.registry.OxidizableBlocksRegistry;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
@@ -7,11 +8,11 @@ import net.minecraft.block.Material;
 import net.minecraft.block.Oxidizable;
 import net.minecraft.block.PressurePlateBlock.ActivationRule;
 import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.tag.TagKey;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-
-import com.sollace.coppergolem.registry.MemoizeRegistries;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ public interface GBlocks {
             COPPER_BLOCKS.add(new ArrayList<>());
         }
         COPPER_BLOCKS.get(setId).add(Map.entry(name, block));
-        return Registry.register(Registry.BLOCK, new Identifier("copper_golem", name), block);
+        return Registry.register(Registries.BLOCK, new Identifier("copper_golem", name), block);
     }
 
     static void bootstrap() {
@@ -59,13 +60,17 @@ public interface GBlocks {
             Function<Map.Entry<Oxidizable.OxidationLevel, MapColor>, T> normalMapper,
             BiFunction<Map.Entry<Oxidizable.OxidationLevel, MapColor>, AbstractBlock.Settings, T> waxedMapper) {
 
-        MemoizeRegistries.OXIDIZABLE.register(types.stream().map(o -> {
+        Block[] oxidizationStates = types.stream().map(o -> {
             var id = o.getKey() == Oxidizable.OxidationLevel.UNAFFECTED ? "" : o.getKey().name().toLowerCase() + "_";
             var normal = register(setId, id + "copper_" + name, normalMapper.apply(o));
             var waxed = register(setId + 1, "waxed_" + id + "copper_" + name, waxedMapper.apply(o, AbstractBlock.Settings.copy(normal)));
-            MemoizeRegistries.HONEYCOMB.register(normal, waxed);
+            OxidizableBlocksRegistry.registerWaxableBlockPair(normal, waxed);
             return normal;
-        }).toArray(Block[]::new));
+        }).toArray(Block[]::new);
+
+        OxidizableBlocksRegistry.registerOxidizableBlockPair(oxidizationStates[0], oxidizationStates[1]);
+        OxidizableBlocksRegistry.registerOxidizableBlockPair(oxidizationStates[1], oxidizationStates[2]);
+        OxidizableBlocksRegistry.registerOxidizableBlockPair(oxidizationStates[2], oxidizationStates[3]);
     }
 
     interface Tags {
@@ -73,7 +78,7 @@ public interface GBlocks {
         TagKey<Block> COPPER_BUTTONS = register("copper_buttons");
 
         static TagKey<Block> register(String name) {
-            return TagKey.of(Registry.BLOCK_KEY, new Identifier("copper_golem", name));
+            return TagKey.of(RegistryKeys.BLOCK, new Identifier("copper_golem", name));
         }
     }
 }

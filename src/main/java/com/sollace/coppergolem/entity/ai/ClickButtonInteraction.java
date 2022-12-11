@@ -1,6 +1,6 @@
 package com.sollace.coppergolem.entity.ai;
 
-import net.minecraft.block.AbstractButtonBlock;
+import net.minecraft.block.ButtonBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -27,7 +27,7 @@ class ClickButtonInteraction extends BlockInteraction {
 
         entity.swingHand(Hand.MAIN_HAND);
 
-        ((AbstractButtonBlock)state.getBlock()).powerOn(state, entity.getEntityWorld(), pos);
+        ((ButtonBlock)state.getBlock()).powerOn(state, entity.getEntityWorld(), pos);
         if (entity.getRandom().nextInt(10) < 2) {
             entity.playSound(GSounds.ENTITY_COPPER_GOLEM_AMBIENT, 1, entity.getSoundPitch());
         }
@@ -36,6 +36,6 @@ class ClickButtonInteraction extends BlockInteraction {
 
     @Override
     public boolean isValid(BlockState state) {
-        return state.getBlock() instanceof CopperButtonBlock && !state.get(AbstractButtonBlock.POWERED);
+        return state.getBlock() instanceof CopperButtonBlock && !state.get(ButtonBlock.POWERED);
     }
 }

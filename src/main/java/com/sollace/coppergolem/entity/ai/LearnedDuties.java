@@ -3,7 +3,7 @@ package com.sollace.coppergolem.entity.ai;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.math.random.Random;
 
 import java.util.Arrays;
@@ -23,16 +23,16 @@ public class LearnedDuties {
             return;
         }
 
-        Identifier id = Registry.BLOCK.getId(state.getBlock());
+        Identifier id = Registries.BLOCK.getId(state.getBlock());
         entries.computeIfAbsent(id, Entry::new).duties.add(duty);
     }
 
     public boolean isKnown(BlockState state) {
-        return !state.isAir() && entries.containsKey(Registry.BLOCK.getId(state.getBlock()));
+        return !state.isAir() && entries.containsKey(Registries.BLOCK.getId(state.getBlock()));
     }
 
     public Optional<Duty> getDuty(BlockState state, Random random) {
-        Set<Duty> duties = entries.getOrDefault(Registry.BLOCK.getId(state.getBlock()), Entry.EMPTY).duties;
+        Set<Duty> duties = entries.getOrDefault(Registries.BLOCK.getId(state.getBlock()), Entry.EMPTY).duties;
         return duties.size() == 0 ? Optional.empty() : Optional.of(List.copyOf(duties).get(random.nextInt(duties.size())));
     }
 

@@ -12,7 +12,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.RotationAxis;
 
 import com.sollace.coppergolem.entity.CopperGolemEntity;
 
@@ -53,8 +53,8 @@ public class CopperGolemEntityRenderer extends MobEntityRenderer<CopperGolemEnti
 
             getContextModel().getPart().rotate(matrices);
             getContextModel().rightArm.rotate(matrices);
-            matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90));
-            matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180));
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180));
 
             boolean isLeft = true;
             matrices.translate((float)(isLeft ? -1 : 1) / 16F, 1 / 16F, 5 / 16F);

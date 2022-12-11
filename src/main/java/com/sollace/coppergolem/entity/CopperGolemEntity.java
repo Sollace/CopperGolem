@@ -38,14 +38,14 @@ import net.minecraft.predicate.block.BlockStatePredicate;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.tag.FluidTags;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.function.MaterialPredicate;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEvents;
 
@@ -133,7 +133,7 @@ public class CopperGolemEntity extends GolemEntity {
     }
 
     public void teachInteraction(ItemStack stack, BlockState state, LearnedDuties.Duty duty) {
-        BlockInteraction interaction = finders.computeIfAbsent(Registry.ITEM.getId(stack.getItem()), id -> {
+        BlockInteraction interaction = finders.computeIfAbsent(Registries.ITEM.getId(stack.getItem()), id -> {
             return BlockInteraction.create(this, 14);
         });
 
@@ -150,7 +150,7 @@ public class CopperGolemEntity extends GolemEntity {
     }
 
     public BlockInteraction getFinder(int maxDistance) {
-        return finders.computeIfAbsent(Registry.ITEM.getId(getMainHandStack().getItem()), id -> {
+        return finders.computeIfAbsent(Registries.ITEM.getId(getMainHandStack().getItem()), id -> {
             return BlockInteraction.create(this, maxDistance);
         });
     }

@@ -2,7 +2,8 @@ package com.sollace.coppergolem;
 
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 
 public interface GSounds {
     SoundEvent ENTITY_COPPER_GOLEM_STEP = register("entity.copper_golem.step");
@@ -15,7 +16,7 @@ public interface GSounds {
 
     static SoundEvent register(String name) {
         Identifier id = new Identifier("copper_golem", name);
-        return Registry.register(Registry.SOUND_EVENT, id, new SoundEvent(id));
+        return Registry.register(Registries.SOUND_EVENT, id, SoundEvent.of(id));
     }
 
     static void bootstrap() {}

@@ -12,7 +12,7 @@ public class CopperPressurePlateBlock extends PressurePlateBlock {
     protected final Oxidizable.OxidationLevel oxidizationLevel;
 
     public CopperPressurePlateBlock(Oxidizable.OxidationLevel oxidizationLevel, ActivationRule type, Settings settings) {
-        super(type, settings);
+        super(type, settings, SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_OFF, SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
         this.oxidizationLevel = oxidizationLevel;
     }
 

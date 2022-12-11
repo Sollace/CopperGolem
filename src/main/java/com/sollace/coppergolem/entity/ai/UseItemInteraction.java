@@ -13,7 +13,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
 import net.minecraft.world.GameRules;
 
 import com.sollace.coppergolem.entity.CopperGolemEntity;
@@ -73,7 +73,7 @@ class UseItemInteraction extends BlockInteraction implements LearnedDuties.Recei
             entity.swingHand(Hand.MAIN_HAND);
         }
 
-        Identifier id = Registry.BLOCK.getId(state.getBlock());
+        Identifier id = Registries.BLOCK.getId(state.getBlock());
 
         if (result.isAccepted()) {
             nonMatchingBlocks.remove(id);
@@ -96,7 +96,7 @@ class UseItemInteraction extends BlockInteraction implements LearnedDuties.Recei
             return true;
         }
 
-        Identifier id = Registry.BLOCK.getId(state.getBlock());
+        Identifier id = Registries.BLOCK.getId(state.getBlock());
 
         if (state.isAir() || nonMatchingBlocks.contains(id)) {
             return false;

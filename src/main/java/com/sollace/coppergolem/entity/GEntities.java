@@ -5,7 +5,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.Registries;
 
 public interface GEntities {
 
@@ -14,7 +15,7 @@ public interface GEntities {
             .setDimensions(0.6F, 0.99F));
 
     private static <T extends Entity> EntityType<T> register(String name, EntityType.Builder<T> builder) {
-        return Registry.register(Registry.ENTITY_TYPE, new Identifier("copper_golem", name), builder.build(name));
+        return Registry.register(Registries.ENTITY_TYPE, new Identifier("copper_golem", name), builder.build(name));
     }
 
     static void bootstrap() {
