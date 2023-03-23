@@ -1,6 +1,5 @@
 package com.sollace.coppergolem.entity;
 
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -39,6 +38,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.registry.tag.FluidTags;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -384,7 +384,7 @@ public class CopperGolemEntity extends GolemEntity {
     @Override
     protected ActionResult interactMob(PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
-        if (stack.isIn(ConventionalItemTags.AXES)) {
+        if (stack.isIn(ItemTags.AXES)) {
             if (waxed) {
                 waxed = false;
                 stack.damage(1, player, t -> t.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
@@ -476,11 +476,20 @@ public class CopperGolemEntity extends GolemEntity {
         bodyYaw = tag.getFloat("bodyYaw");
         prevBodyYaw = bodyYaw;
         stepBobbingAmount = tag.getFloat("stepBobbingAmount");
-        limbAngle = tag.getFloat("limbAngle");
-        limbDistance = tag.getFloat("limbDistance");
-        lastLimbDistance = limbDistance;
+        limbAnimator.setSpeed(0);
+        limbAnimator.updateLimbs(tag.getFloat("limbAngle") - limbAnimator.getPos(), 1);
         handSwingProgress = tag.getFloat("handSwingProgress");
         lastHandSwingProgress = handSwingProgress;
+    }
+
+    @Override
+    protected void updateLimbs(float posDelta) {
+        if (inanimate) {
+            limbAnimator.setSpeed(0);
+            limbAnimator.updateLimbs(0, 0);
+            return;
+        }
+        super.updateLimbs(posDelta);
     }
 
     public NbtCompound storeAngles() {
@@ -488,8 +497,7 @@ public class CopperGolemEntity extends GolemEntity {
         tag.putFloat("pitch", getPitch());
         tag.putFloat("bodyYaw", bodyYaw);
         tag.putFloat("stepBobbingAmount", stepBobbingAmount);
-        tag.putFloat("limbAngle", limbAngle);
-        tag.putFloat("limbDistance", limbDistance);
+        tag.putFloat("limbAngle", limbAnimator.getPos());
         tag.putFloat("handSwingProgress", handSwingProgress);
         return tag;
     }
@@ -563,6 +571,9 @@ public class CopperGolemEntity extends GolemEntity {
 
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
+        if (inanimate) {
+            return SoundEvents.BLOCK_COPPER_HIT;
+        }
         return GSounds.ENTITY_COPPER_GOLEM_HURT;
     }
 

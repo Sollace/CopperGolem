@@ -83,7 +83,7 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
     public void setAngles(CopperGolemEntity entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
 
         if (entity.inanimate) {
-            limbAngle = entity.limbAngle - entity.limbDistance;
+            limbAngle = entity.limbAnimator.getPos(0);
             animationProgress = 1;
         }
 

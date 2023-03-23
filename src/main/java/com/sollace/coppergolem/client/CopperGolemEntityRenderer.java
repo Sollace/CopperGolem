@@ -7,7 +7,7 @@ import net.minecraft.client.render.entity.MobEntityRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.item.HeldItemRenderer;
-import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
@@ -59,7 +59,7 @@ public class CopperGolemEntityRenderer extends MobEntityRenderer<CopperGolemEnti
             boolean isLeft = true;
             matrices.translate((float)(isLeft ? -1 : 1) / 16F, 1 / 16F, 5 / 16F);
 
-            heldItemRenderer.renderItem(entity, item, ModelTransformation.Mode.THIRD_PERSON_RIGHT_HAND, false, matrices, vertices, light);
+            heldItemRenderer.renderItem(entity, item, ModelTransformationMode.THIRD_PERSON_RIGHT_HAND, false, matrices, vertices, light);
             matrices.pop();
         }
     }
