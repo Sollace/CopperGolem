@@ -77,6 +77,8 @@ public interface GBlocks {
         TagKey<Block> COPPER_GOLEM_MATERIALS = register("copper_golem_materials");
         TagKey<Block> COPPER_BUTTONS = register("copper_buttons");
 
+        TagKey<Block> CONVENTIONAL_COPPER_LIGHTNING_RODS = TagKey.of(RegistryKeys.BLOCK, new Identifier("c", "copper_lightning_rods"));
+
         static TagKey<Block> register(String name) {
             return TagKey.of(RegistryKeys.BLOCK, new Identifier("copper_golem", name));
         }

@@ -33,7 +33,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.predicate.block.BlockStatePredicate;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -88,7 +87,7 @@ public class CopperGolemEntity extends GolemEntity {
             .aisle("|", "#")
             .aisle("~", "o")
             .where('~', CachedBlockPosition.matchesBlockState(MaterialPredicate.create(Material.AIR)))
-            .where('|', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(Blocks.LIGHTNING_ROD)))
+            .where('|', CachedBlockPosition.matchesBlockState(BlockStatePredicates.forTag(GBlocks.Tags.CONVENTIONAL_COPPER_LIGHTNING_RODS)))
             .where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicates.forTag(GBlocks.Tags.COPPER_GOLEM_MATERIALS)))
             .where('o', CachedBlockPosition.matchesBlockState(BlockStatePredicates.forTag(GBlocks.Tags.COPPER_BUTTONS)))
             .build();
