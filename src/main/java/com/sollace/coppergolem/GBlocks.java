@@ -4,7 +4,6 @@ import net.fabricmc.fabric.api.registry.OxidizableBlocksRegistry;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
-import net.minecraft.block.Material;
 import net.minecraft.block.Oxidizable;
 import net.minecraft.block.PressurePlateBlock.ActivationRule;
 import net.minecraft.sound.BlockSoundGroup;
@@ -41,16 +40,16 @@ public interface GBlocks {
 
         // generate buttons
         generateCopperBlocks(0, set, "button", o -> {
-            return new OxidizableCopperButtonBlock(o.getKey(), AbstractBlock.Settings.of(Material.METAL, o.getValue())
-                .requiresTool().strength(3, 6).sounds(BlockSoundGroup.COPPER));
+            return new OxidizableCopperButtonBlock(o.getKey(), AbstractBlock.Settings.create()
+                    .mapColor(o.getValue()).requiresTool().strength(3, 6).sounds(BlockSoundGroup.COPPER));
         }, (o, settings) -> {
             return new CopperButtonBlock(o.getKey(), settings);
         });
 
         // generate pressure plates
         generateCopperBlocks(2, set, "pressure_plate", o -> {
-            return new OxidizableCopperPressurePlateBlock(o.getKey(), ActivationRule.EVERYTHING, AbstractBlock.Settings.of(Material.METAL, o.getValue())
-                    .noCollision().requiresTool().strength(0.5F).sounds(BlockSoundGroup.COPPER));
+            return new OxidizableCopperPressurePlateBlock(o.getKey(), ActivationRule.EVERYTHING, AbstractBlock.Settings.create()
+                    .mapColor(o.getValue()).noCollision().requiresTool().strength(0.5F).sounds(BlockSoundGroup.COPPER));
         }, (o, settings) -> {
             return new CopperPressurePlateBlock(o.getKey(), ActivationRule.EVERYTHING, settings);
         });

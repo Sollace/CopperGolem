@@ -66,11 +66,11 @@ public class MineBlockGoal extends Goal {
         }
 
         public boolean isStillValid() {
-            return mob.world.getBlockState(pos) == state;
+            return mob.getWorld().getBlockState(pos) == state;
         }
 
         public boolean tick() {
-            float hardness = state.getHardness(mob.world, pos);
+            float hardness = state.getHardness(mob.getWorld(), pos);
             if (hardness < 0) {
                 progress++;
                 return progress < 120;
@@ -86,11 +86,11 @@ public class MineBlockGoal extends Goal {
             progress += breakingDelta;
             mob.swingHand(Hand.MAIN_HAND);
             mob.lookAt(EntityAnchor.FEET, new Vec3d(pos.getX(), pos.getY(), pos.getZ()));
-            mob.world.setBlockBreakingInfo(mob.getId(), pos, (int)(progress * 10));
+            mob.getWorld().setBlockBreakingInfo(mob.getId(), pos, (int)(progress * 10));
 
             if ((int)(progress * 100) % 2 == 0) {
                 BlockSoundGroup group = state.getSoundGroup();
-                mob.world.playSound(null, pos,
+                mob.getWorld().playSound(null, pos,
                         group.getHitSound(),
                         SoundCategory.BLOCKS,
                         (group.getVolume() + 1) / 8F,
@@ -101,24 +101,24 @@ public class MineBlockGoal extends Goal {
             if (progress > 1) {
                 Block block = state.getBlock();
 
-                if (mob.world.getGameRules().get(GameRules.DO_MOB_GRIEFING).get()) {
-                    PlayerEntity nearestPlayer = mob.world.getClosestPlayer(mob, 10);
-                    mob.world.syncWorldEvent(null, WorldEvents.BLOCK_BROKEN, pos, Block.getRawIdFromState(state));
+                if (mob.getWorld().getGameRules().get(GameRules.DO_MOB_GRIEFING).get()) {
+                    PlayerEntity nearestPlayer = mob.getWorld().getClosestPlayer(mob, 10);
+                    mob.getWorld().syncWorldEvent(null, WorldEvents.BLOCK_BROKEN, pos, Block.getRawIdFromState(state));
                     if (nearestPlayer == null) {
-                        mob.world.breakBlock(pos, canMine, mob);
+                        mob.getWorld().breakBlock(pos, canMine, mob);
                     } else {
-                        BlockEntity be = mob.world.getBlockEntity(pos);
-                        block.onBreak(mob.world, pos, state, nearestPlayer);
-                        boolean removed = mob.world.removeBlock(pos, false);
+                        BlockEntity be = mob.getWorld().getBlockEntity(pos);
+                        block.onBreak(mob.getWorld(), pos, state, nearestPlayer);
+                        boolean removed = mob.getWorld().removeBlock(pos, false);
                         if (removed) {
-                            block.onBroken(mob.world, pos, state);
+                            block.onBroken(mob.getWorld(), pos, state);
                         }
 
                         ItemStack heldItem = mob.getMainHandStack();
                         ItemStack copy = heldItem.copy();
-                        heldItem.getItem().postMine(heldItem, mob.world, state, pos, mob);
+                        heldItem.getItem().postMine(heldItem, mob.getWorld(), state, pos, mob);
                         if (removed && canMine) {
-                            block.afterBreak(mob.world, nearestPlayer, pos, state, be, copy);
+                            block.afterBreak(mob.getWorld(), nearestPlayer, pos, state, be, copy);
                         }
                     }
                 }

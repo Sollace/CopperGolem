@@ -3,7 +3,6 @@ package com.sollace.coppergolem.entity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.Material;
 import net.minecraft.block.Oxidizable;
 import net.minecraft.block.Oxidizable.OxidationLevel;
 import net.minecraft.block.WallMountedBlock;
@@ -41,7 +40,6 @@ import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.function.MaterialPredicate;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.registry.Registries;
@@ -86,7 +84,7 @@ public class CopperGolemEntity extends GolemEntity {
     private static final BlockPattern PATTERN = BlockPatternBuilder.start()
             .aisle("|", "#")
             .aisle("~", "o")
-            .where('~', CachedBlockPosition.matchesBlockState(MaterialPredicate.create(Material.AIR)))
+            .where('~', CachedBlockPosition.matchesBlockState(BlockState::isAir))
             .where('|', CachedBlockPosition.matchesBlockState(BlockStatePredicates.forTag(GBlocks.Tags.CONVENTIONAL_COPPER_LIGHTNING_RODS)))
             .where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicates.forTag(GBlocks.Tags.COPPER_GOLEM_MATERIALS)))
             .where('o', CachedBlockPosition.matchesBlockState(BlockStatePredicates.forTag(GBlocks.Tags.COPPER_BUTTONS)))
@@ -286,7 +284,7 @@ public class CopperGolemEntity extends GolemEntity {
         if (isSubmergedIn(FluidTags.WATER) && !EnchantmentHelper.hasAquaAffinity(this)) {
             speed /= 5F;
         }
-        if (!onGround) {
+        if (!isOnGround()) {
             speed /= 5F;
         }
         return speed;
@@ -320,7 +318,7 @@ public class CopperGolemEntity extends GolemEntity {
         inanimate = getDegradationLevel() == OxidationLevel.OXIDIZED;
 
         if (inanimate) {
-            if (getPosing().isEmpty() && !world.isClient) {
+            if (getPosing().isEmpty() && !getWorld().isClient) {
                 setPosing(Optional.of(storeAngles()));
             }
 
@@ -328,11 +326,11 @@ public class CopperGolemEntity extends GolemEntity {
 
             getPosing().ifPresent(this::loadAngles);
         } else {
-            if (getPosing().isPresent() && !world.isClient) {
+            if (getPosing().isPresent() && !getWorld().isClient) {
                 setPosing(Optional.empty());
             }
 
-            if (world.isClient && reachingTicks == 0 && getReachDirection() != REACHING_NONE) {
+            if (getWorld().isClient && reachingTicks == 0 && getReachDirection() != REACHING_NONE) {
                 setReachDirection(REACHING_NONE);
                 reachingTicks = 200;
             }
@@ -387,14 +385,14 @@ public class CopperGolemEntity extends GolemEntity {
             if (waxed) {
                 waxed = false;
                 stack.damage(1, player, t -> t.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
-                world.sendEntityStatus(this, WAX_OFF_STATUS);
+                getWorld().sendEntityStatus(this, WAX_OFF_STATUS);
                 playSound(SoundEvents.ITEM_AXE_WAX_OFF, 1, 1);
 
                 return ActionResult.SUCCESS;
             } else if (getOxidation() >= 100) {
                 setOxidation(100 * (getDegradationLevel().ordinal() - 1));
                 stack.damage(1, player, t -> t.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
-                world.sendEntityStatus(this, SCRAPE_STATUS);
+                getWorld().sendEntityStatus(this, SCRAPE_STATUS);
                 playSound(SoundEvents.ITEM_AXE_SCRAPE, 1, 1);
                 spinHead();
 
@@ -402,7 +400,7 @@ public class CopperGolemEntity extends GolemEntity {
             }
         } else if (stack.isOf(Items.HONEYCOMB) && !waxed) {
             waxed = true;
-            world.sendEntityStatus(this, WAX_ON_STATUS);
+            getWorld().sendEntityStatus(this, WAX_ON_STATUS);
             playSound(SoundEvents.ITEM_HONEYCOMB_WAX_ON, 1, 1);
 
             if (!player.getAbilities().creativeMode) {
@@ -549,7 +547,7 @@ public class CopperGolemEntity extends GolemEntity {
 
     protected void produceParticles(ParticleEffect parameters) {
         for (int i = 0; i < 5; ++i) {
-            world.addParticle(parameters,
+            getWorld().addParticle(parameters,
                     getParticleX(1), getRandomBodyY() + 1, getParticleZ(1),
                     random.nextGaussian() * 0.02,
                     random.nextGaussian() * 0.02,

@@ -48,7 +48,7 @@ class UseItemInteraction extends BlockInteraction implements LearnedDuties.Recei
     public boolean perform(CopperGolemEntity entity, BlockPos pos, BlockState state) {
         ItemStack stack = entity.getStackInHand(Hand.MAIN_HAND);
 
-        if (!entity.world.getGameRules().get(GameRules.DO_MOB_GRIEFING).get()) {
+        if (!entity.getWorld().getGameRules().get(GameRules.DO_MOB_GRIEFING).get()) {
             return false;
         }
 

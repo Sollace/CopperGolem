@@ -27,7 +27,7 @@ public class CopperGolemUtil {
     public static void broadCastLesson(World world, BlockState state, BlockPos center, ItemStack item, LearnedDuties.Duty duty) {
         Box box = new Box(center).expand(3);
         world.getEntitiesByType(GEntities.COPPER_GOLEM, box, golem -> {
-            return golem != null && golem.isAlive() && golem.getMainHandStack().isItemEqual(item);
+            return golem != null && golem.isAlive() && ItemStack.areItemsEqual(golem.getMainHandStack(), item);
         }).forEach(golem -> {
            golem.teachInteraction(item, state, duty);
         });
