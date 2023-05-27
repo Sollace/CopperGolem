@@ -16,6 +16,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.registry.Registries;
 import net.minecraft.world.GameRules;
 
+import com.sollace.coppergolem.Main;
 import com.sollace.coppergolem.entity.CopperGolemEntity;
 import com.sollace.coppergolem.entity.ai.LearnedDuties.Duty;
 
@@ -66,7 +67,12 @@ class UseItemInteraction extends BlockInteraction implements LearnedDuties.Recei
                 result = ActionResult.SUCCESS;
                 break;
             default:
-                result = stack.useOnBlock(new AutomaticItemPlacementContext(entity.getEntityWorld(), pos, entity.getHorizontalFacing(), stack, Direction.UP));
+                try {
+                    result = stack.useOnBlock(new AutomaticItemPlacementContext(entity.getWorld(), pos, entity.getHorizontalFacing(), stack, Direction.UP));
+                } catch (Throwable t) {
+                    Main.LOGGER.fatal("Failed to trigger item use. If you have another mod installed, please report this to them", t);
+                    result = ActionResult.FAIL;
+                }
         }
 
         if (result.shouldSwingHand()) {
