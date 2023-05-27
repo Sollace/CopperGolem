@@ -27,8 +27,17 @@ public class Main implements ModInitializer {
     }
 
     private void initGoals(MobEntity mob, GoalSelector goals, GoalSelector targets) {
-        if (mob instanceof CatEntity) {
-            targets.add(1, new FleeEntityGoal<>((CatEntity)mob, CopperGolemEntity.class, 5F, 0.8D, 1));
+        if (mob instanceof CatEntity cat) {
+            targets.add(1, new FleeEntityGoal<>(cat, CopperGolemEntity.class, 5F, 0.8D, 1) {
+                public boolean canStart() {
+                    return !cat.isSitting() && super.canStart();
+                }
+
+                @Override
+                public boolean shouldContinue() {
+                    return !cat.isSitting() && super.shouldContinue();
+                }
+            });
         }
     }
 }
