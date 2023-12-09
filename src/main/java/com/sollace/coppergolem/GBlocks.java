@@ -5,7 +5,6 @@ import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.Oxidizable;
-import net.minecraft.block.PressurePlateBlock.ActivationRule;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
@@ -48,10 +47,10 @@ public interface GBlocks {
 
         // generate pressure plates
         generateCopperBlocks(2, set, "pressure_plate", o -> {
-            return new OxidizableCopperPressurePlateBlock(o.getKey(), ActivationRule.EVERYTHING, AbstractBlock.Settings.create()
+            return new OxidizableCopperPressurePlateBlock(o.getKey(), AbstractBlock.Settings.create()
                     .mapColor(o.getValue()).noCollision().requiresTool().strength(0.5F).sounds(BlockSoundGroup.COPPER));
         }, (o, settings) -> {
-            return new CopperPressurePlateBlock(o.getKey(), ActivationRule.EVERYTHING, settings);
+            return new CopperPressurePlateBlock(o.getKey(), settings);
         });
     }
 

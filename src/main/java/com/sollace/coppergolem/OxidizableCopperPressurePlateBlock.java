@@ -8,8 +8,8 @@ import net.minecraft.util.math.random.Random;
 
 public class OxidizableCopperPressurePlateBlock extends CopperPressurePlateBlock implements Oxidizable {
 
-    public OxidizableCopperPressurePlateBlock(Oxidizable.OxidationLevel oxidizationLevel, ActivationRule type, Settings settings) {
-        super(oxidizationLevel, type, settings);
+    public OxidizableCopperPressurePlateBlock(Oxidizable.OxidationLevel oxidizationLevel, Settings settings) {
+        super(oxidizationLevel, settings);
     }
 
     @Override

@@ -21,7 +21,7 @@ public class CopperButtonBlock extends ButtonBlock {
     protected final Oxidizable.OxidationLevel oxidizationLevel;
 
     protected CopperButtonBlock(Oxidizable.OxidationLevel oxidizationLevel, Settings settings) {
-        super(settings, BlockSetType.IRON, 0, false);
+        super(BlockSetType.IRON, 0, settings);
         this.oxidizationLevel = oxidizationLevel;
     }
 

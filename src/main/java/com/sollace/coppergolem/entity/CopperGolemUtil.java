@@ -14,7 +14,7 @@ import java.util.Optional;
 public class CopperGolemUtil {
 
     public static Optional<BlockPos> getGolemAtPos(World world, BlockPos pos) {
-        Box box = new Box(pos, new BlockPos(pos.getX(), world.getTopY(), pos.getZ())).expand(3.0);
+        Box box = Box.enclosing(pos, new BlockPos(pos.getX(), world.getTopY(), pos.getZ())).expand(3.0);
         return Optional.of(world.getEntitiesByType(GEntities.COPPER_GOLEM, box, golem -> {
             return golem != null && golem.isAlive()
                 && golem.getDegradationLevel() == OxidationLevel.OXIDIZED

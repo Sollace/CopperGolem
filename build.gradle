@@ -19,7 +19,7 @@ java {
 }
 
 outlet.allowSnapshotsForProject = false
-outlet.mcVersionRange = project.minecraft_version_range
+outlet.mcVersionRange = ">=${project.minecraft_version}"
 
 group = project.group
 description = project.displayname
@@ -54,7 +54,10 @@ processResources {
     inputs.property "version", project.version.toString()
 
     filesMatching("fabric.mod.json") {
-        expand "version": project.version.toString()
+        expand "version": project.version.toString(),
+                "minecraftVersion": ">=${project.minecraft_version}",
+                "loaderVersion": ">=${project.loader_version}",
+                "fabricVersion": ">=${project.fabric_version}"
     }
 
     from 'LICENSE'
@@ -84,6 +87,6 @@ modrinth {
       gameVersions.add ver
     }
     dependencies {
-       required.project 'P7dR8mSH'
+       required.project 'P7dR8mSH' // Fabric API
     }
 }

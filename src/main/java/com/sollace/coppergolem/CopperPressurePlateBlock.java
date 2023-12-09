@@ -21,8 +21,8 @@ public class CopperPressurePlateBlock extends PressurePlateBlock {
 
     protected final Oxidizable.OxidationLevel oxidizationLevel;
 
-    public CopperPressurePlateBlock(Oxidizable.OxidationLevel oxidizationLevel, ActivationRule type, Settings settings) {
-        super(type, settings, BlockSetType.IRON);
+    public CopperPressurePlateBlock(Oxidizable.OxidationLevel oxidizationLevel, Settings settings) {
+        super(BlockSetType.IRON, settings);
         this.oxidizationLevel = oxidizationLevel;
     }
 
