@@ -119,14 +119,14 @@ public class CopperGolemEntity extends GolemEntity {
     }
 
     @Override
-    protected void initDataTracker() {
-        super.initDataTracker();
-        dataTracker.startTracking(OXIDATION, 0);
-        dataTracker.startTracking(WIGGLING_NOSE_TIME, 0);
-        dataTracker.startTracking(SPINNING_HEAD_TIME, 0);
-        dataTracker.startTracking(CHASING, false);
-        dataTracker.startTracking(REACH_DIRECTION, REACHING_NONE);
-        dataTracker.startTracking(POSING, new NbtCompound());
+    protected void initDataTracker(DataTracker.Builder builder) {
+        super.initDataTracker(builder);
+        builder.add(OXIDATION, 0);
+        builder.add(WIGGLING_NOSE_TIME, 0);
+        builder.add(SPINNING_HEAD_TIME, 0);
+        builder.add(CHASING, false);
+        builder.add(REACH_DIRECTION, REACHING_NONE);
+        builder.add(POSING, new NbtCompound());
     }
 
     public void teachInteraction(ItemStack stack, BlockState state, LearnedDuties.Duty duty) {
@@ -155,12 +155,8 @@ public class CopperGolemEntity extends GolemEntity {
     @Override
     public boolean canPickupItem(ItemStack stack) {
         ItemStack current = getMainHandStack();
-
-        if (!current.isEmpty() && ItemStack.canCombine(current, stack)) {
-            return true;
-        }
-
-        return stack.isIn(GItems.Tags.COPPER_GOLEM_CAN_PICK_UP);
+        return (!current.isEmpty() && ItemStack.areItemsAndComponentsEqual(current, stack) && current.getCount() < current.getMaxCount())
+            || stack.isIn(GItems.Tags.COPPER_GOLEM_CAN_PICK_UP);
     }
 
     @Override
@@ -383,14 +379,14 @@ public class CopperGolemEntity extends GolemEntity {
         if (stack.isIn(ItemTags.AXES)) {
             if (waxed) {
                 waxed = false;
-                stack.damage(1, player, t -> t.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
+                stack.damage(1, player, EquipmentSlot.MAINHAND);
                 getWorld().sendEntityStatus(this, WAX_OFF_STATUS);
                 playSound(SoundEvents.ITEM_AXE_WAX_OFF, 1, 1);
 
                 return ActionResult.SUCCESS;
             } else if (getOxidation() >= 100) {
                 setOxidation(100 * (getDegradationLevel().ordinal() - 1));
-                stack.damage(1, player, t -> t.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
+                stack.damage(1, player, EquipmentSlot.MAINHAND);
                 getWorld().sendEntityStatus(this, SCRAPE_STATUS);
                 playSound(SoundEvents.ITEM_AXE_SCRAPE, 1, 1);
                 spinHead();
@@ -432,11 +428,11 @@ public class CopperGolemEntity extends GolemEntity {
                     playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1, 1);
                     return ActionResult.SUCCESS;
                 }
-            } else if (heldStack.isEmpty() || ItemStack.canCombine(heldStack, stack)) {
+            } else if (heldStack.isEmpty() || (ItemStack.areItemsAndComponentsEqual(heldStack, stack) && heldStack.getCount() < heldStack.getMaxCount())) {
                 ItemStack newStack = stack.split(1);
                 newStack.increment(heldStack.getCount());
                 equipStack(EquipmentSlot.MAINHAND, newStack);
-                playSound(SoundEvents.ITEM_ARMOR_EQUIP_CHAIN, 1, 1);
+                playSound(SoundEvents.ITEM_ARMOR_EQUIP_CHAIN.value(), 1, 1);
                 handDropChances[EquipmentSlot.MAINHAND.getEntitySlotId()] = 2;
                 swingHand(Hand.MAIN_HAND);
 

@@ -12,7 +12,7 @@ public interface GEntities {
 
     EntityType<CopperGolemEntity> COPPER_GOLEM = register("copper_golem", EntityType.Builder.create(CopperGolemEntity::new, SpawnGroup.CREATURE)
             .makeFireImmune()
-            .setDimensions(0.6F, 0.99F));
+            .dimensions(0.6F, 0.99F));
 
     private static <T extends Entity> EntityType<T> register(String name, EntityType.Builder<T> builder) {
         return Registry.register(Registries.ENTITY_TYPE, new Identifier("copper_golem", name), builder.build(name));
