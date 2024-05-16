@@ -299,8 +299,7 @@ public class CopperGolemEntity extends GolemEntity {
     protected boolean isImmobile() {
         return super.isImmobile()
                 || getDegradationLevel() == OxidationLevel.OXIDIZED
-                || getReachDirection() != REACHING_NONE
-                || (miningGoal != null && miningGoal.canStart());
+                || getReachDirection() != REACHING_NONE;
     }
 
     @Override
@@ -332,7 +331,7 @@ public class CopperGolemEntity extends GolemEntity {
 
             if (getWorld().isClient && reachingTicks == 0 && getReachDirection() != REACHING_NONE) {
                 setReachDirection(REACHING_NONE);
-                reachingTicks = 200;
+                reachingTicks = 130;
             }
 
             prevReachingTicks = reachingTicks;
