@@ -4,7 +4,9 @@ import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRe
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.util.Identifier;
+
+import com.sollace.coppergolem.Main;
+
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.Registries;
 
@@ -15,7 +17,7 @@ public interface GEntities {
             .dimensions(0.6F, 0.99F));
 
     private static <T extends Entity> EntityType<T> register(String name, EntityType.Builder<T> builder) {
-        return Registry.register(Registries.ENTITY_TYPE, new Identifier("copper_golem", name), builder.build(name));
+        return Registry.register(Registries.ENTITY_TYPE, Main.id(name), builder.build(name));
     }
 
     static void bootstrap() {

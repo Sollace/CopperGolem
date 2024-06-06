@@ -9,7 +9,6 @@ import net.minecraft.block.WallMountedBlock;
 import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.block.pattern.BlockPatternBuilder;
 import net.minecraft.block.pattern.CachedBlockPosition;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
@@ -17,6 +16,8 @@ import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
+import net.minecraft.entity.attribute.DefaultAttributeContainer;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -100,6 +101,14 @@ public class CopperGolemEntity extends GolemEntity {
 
     @Nullable
     private MineBlockGoal miningGoal;
+
+    public static DefaultAttributeContainer.Builder createGolemAttributes() {
+        return createMobAttributes()
+                .add(EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, 4.5)
+                .add(EntityAttributes.PLAYER_BLOCK_BREAK_SPEED)
+                .add(EntityAttributes.PLAYER_SUBMERGED_MINING_SPEED)
+                .add(EntityAttributes.PLAYER_MINING_EFFICIENCY);
+    }
 
     CopperGolemEntity(EntityType<CopperGolemEntity> type, World world) {
         super(type, world);
@@ -228,7 +237,7 @@ public class CopperGolemEntity extends GolemEntity {
     }
 
     public double getArmReach() {
-        return getWidth() * 2;
+        return getWidth() * 2 + getAttributeValue(EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE);
     }
 
     public boolean isWigglingNose() {
@@ -261,10 +270,7 @@ public class CopperGolemEntity extends GolemEntity {
         ItemStack heldItem = this.getMainHandStack();
         float speed = heldItem.getMiningSpeedMultiplier(block) * 0.67F;
         if (speed > 1) {
-            int efficiency = EnchantmentHelper.getEfficiency(this);
-            if (efficiency > 0 && !heldItem.isEmpty()) {
-                speed += (float)(efficiency * efficiency + 1);
-            }
+            speed += getAttributeValue(EntityAttributes.PLAYER_MINING_EFFICIENCY);
         }
         if (StatusEffectUtil.hasHaste(this)) {
             speed *= 1.0f + (float)(StatusEffectUtil.getHasteAmplifier(this) + 1) * 0.2f;
@@ -277,8 +283,10 @@ public class CopperGolemEntity extends GolemEntity {
                 default -> 8.1E-4f;
             });
         }
-        if (isSubmergedIn(FluidTags.WATER) && !EnchantmentHelper.hasAquaAffinity(this)) {
-            speed /= 5F;
+
+        speed *= (float)this.getAttributeValue(EntityAttributes.PLAYER_BLOCK_BREAK_SPEED);
+        if (isSubmergedIn(FluidTags.WATER)) {
+            speed *= (float)getAttributeInstance(EntityAttributes.PLAYER_SUBMERGED_MINING_SPEED).getValue();
         }
         if (!isOnGround()) {
             speed /= 5F;

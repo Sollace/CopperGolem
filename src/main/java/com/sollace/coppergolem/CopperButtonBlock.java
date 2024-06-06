@@ -12,6 +12,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.event.GameEvent;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -40,11 +41,13 @@ public class CopperButtonBlock extends ButtonBlock {
     }
 
     @Override
-    public void powerOn(BlockState state, World world, BlockPos pos) {
-        world.setBlockState(pos, (BlockState)state.with(POWERED, true), Block.NOTIFY_ALL);
+    public void powerOn(BlockState state, World world, BlockPos pos, PlayerEntity player) {
+        world.setBlockState(pos, state.with(POWERED, true), Block.NOTIFY_ALL);
         world.updateNeighborsAlways(pos, this);
         world.updateNeighborsAlways(pos.offset(ButtonBlock.getDirection(state).getOpposite()), this);
         world.scheduleBlockTick(pos, this, getCustomPressTicks());
+        playClickSound(player, world, pos, true);
+        world.emitGameEvent(player, GameEvent.BLOCK_ACTIVATE, pos);
         CopperGolemEntity.tryBuild(world, pos.offset(state.get(FACING).getOpposite()));
     }
 }

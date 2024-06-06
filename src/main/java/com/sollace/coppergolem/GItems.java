@@ -8,7 +8,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.item.Items;
 import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,7 @@ import net.minecraft.registry.Registries;
 
 public interface GItems {
     static Item register(String name, Block block) {
-        return Registry.register(Registries.ITEM, new Identifier("copper_golem", name), new BlockItem(block, new Item.Settings()));
+        return Registry.register(Registries.ITEM, Main.id(name), new BlockItem(block, new Item.Settings()));
     }
 
     static void bootstrap() {
@@ -49,7 +48,7 @@ public interface GItems {
         TagKey<Item> COPPER_GOLEM_CAN_PICK_UP = register("copper_golem_can_pick_up");
 
         static TagKey<Item> register(String name) {
-            return TagKey.of(RegistryKeys.ITEM, new Identifier("copper_golem", name));
+            return TagKey.of(RegistryKeys.ITEM, Main.id(name));
         }
     }
 }

@@ -8,6 +8,7 @@ import net.minecraft.entity.ai.goal.FleeEntityGoal;
 import net.minecraft.entity.ai.goal.GoalSelector;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.CatEntity;
+import net.minecraft.util.Identifier;
 
 import com.sollace.coppergolem.entity.CopperGolemEntity;
 import com.sollace.coppergolem.entity.GEntities;
@@ -15,6 +16,10 @@ import com.sollace.coppergolem.registry.MobEntityInitGoalsListener;
 
 public class Main implements ModInitializer {
     public static final Logger LOGGER = LogManager.getLogger("CopperGolem");
+
+    public static Identifier id(String name) {
+        return Identifier.of("copper_golem", name);
+    }
 
     @Override
     public void onInitialize() {

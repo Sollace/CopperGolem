@@ -27,7 +27,7 @@ class ClickButtonInteraction extends BlockInteraction {
 
         entity.swingHand(Hand.MAIN_HAND);
 
-        ((ButtonBlock)state.getBlock()).powerOn(state, entity.getEntityWorld(), pos);
+        ((ButtonBlock)state.getBlock()).powerOn(state, entity.getEntityWorld(), pos, null);
         if (entity.getRandom().nextInt(10) < 2) {
             entity.playSound(GSounds.ENTITY_COPPER_GOLEM_AMBIENT, 1, entity.getSoundPitch());
         }

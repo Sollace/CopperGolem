@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 
+import com.sollace.coppergolem.Main;
 import com.sollace.coppergolem.entity.CopperGolemEntity;
 
 import java.util.HashMap;
@@ -29,7 +30,7 @@ public class CopperGolemEntityRenderer extends MobEntityRenderer<CopperGolemEnti
 
     @Override
     public Identifier getTexture(CopperGolemEntity entity) {
-        return textures.computeIfAbsent(entity.getDegradationLevel(), l -> new Identifier("copper_golem", "textures/entity/copper_golem/copper_golem_" + l.name().toLowerCase() + ".png"));
+        return textures.computeIfAbsent(entity.getDegradationLevel(), l -> Main.id("textures/entity/copper_golem/copper_golem_" + l.name().toLowerCase() + ".png"));
     }
 
     public static class HeldItem extends FeatureRenderer<CopperGolemEntity, CopperGolemEntityModel> {

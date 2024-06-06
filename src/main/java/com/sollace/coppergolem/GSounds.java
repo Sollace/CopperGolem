@@ -15,7 +15,7 @@ public interface GSounds {
     SoundEvent ENTITY_COPPER_GOLEM_WHIRL = register("entity.copper_golem.whirl");
 
     static SoundEvent register(String name) {
-        Identifier id = new Identifier("copper_golem", name);
+        Identifier id = Main.id(name);
         return Registry.register(Registries.SOUND_EVENT, id, SoundEvent.of(id));
     }
 

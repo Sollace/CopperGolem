@@ -26,7 +26,7 @@ public interface GBlocks {
             COPPER_BLOCKS.add(new ArrayList<>());
         }
         COPPER_BLOCKS.get(setId).add(Map.entry(name, block));
-        return Registry.register(Registries.BLOCK, new Identifier("copper_golem", name), block);
+        return Registry.register(Registries.BLOCK, Main.id(name), block);
     }
 
     static void bootstrap() {
@@ -75,10 +75,10 @@ public interface GBlocks {
         TagKey<Block> COPPER_GOLEM_MATERIALS = register("copper_golem_materials");
         TagKey<Block> COPPER_BUTTONS = register("copper_buttons");
 
-        TagKey<Block> CONVENTIONAL_COPPER_LIGHTNING_RODS = TagKey.of(RegistryKeys.BLOCK, new Identifier("c", "copper_lightning_rods"));
+        TagKey<Block> CONVENTIONAL_COPPER_LIGHTNING_RODS = TagKey.of(RegistryKeys.BLOCK, Identifier.of("c", "copper_lightning_rods"));
 
         static TagKey<Block> register(String name) {
-            return TagKey.of(RegistryKeys.BLOCK, new Identifier("copper_golem", name));
+            return TagKey.of(RegistryKeys.BLOCK, Main.id(name));
         }
     }
 }

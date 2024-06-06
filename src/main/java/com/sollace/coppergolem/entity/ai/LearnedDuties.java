@@ -57,7 +57,7 @@ public class LearnedDuties {
     }
 
     static class Entry {
-        static final Entry EMPTY = new Entry(new Identifier("air"));
+        static final Entry EMPTY = new Entry(Identifier.ofVanilla("air"));
         public final Identifier id;
         public final Set<Duty> duties = new HashSet<>();
 
