@@ -36,8 +36,6 @@ public class PressButtonGoal extends Goal {
 
     @Override
     public boolean canStart() {
-        System.out.println("PressButtonGoal.canStart? " + idleTicks);
-
         if (entity.isPreoccupied()) {
             return false;
         }
@@ -52,13 +50,11 @@ public class PressButtonGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        System.out.println("PressButtonGoal.shouldContinue? " + idleTicks);
         return !entity.isPreoccupied() && entity.getNavigation().isFollowingPath();
     }
 
     @Override
     public void start() {
-        System.out.println("PressButtonGoal.start? " + idleTicks);
         if (entity.isPreoccupied()) {
             return;
         }
@@ -76,7 +72,6 @@ public class PressButtonGoal extends Goal {
 
     @Override
     public void stop() {
-        System.out.println("PressButtonGoal.stop? " + idleTicks);
         target = Optional.empty();
         entity.getNavigation().stop();
     }
@@ -92,7 +87,6 @@ public class PressButtonGoal extends Goal {
     }
 
     public void tick() {
-        System.out.println("PressButtonGoal.stick? " + idleTicks);
         if (entity.isPreoccupied()) {
             return;
         }
