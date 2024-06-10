@@ -26,5 +26,17 @@
   "subtitles.entity.copper_golem.hurt": "Copper Golem hurts",
   "subtitles.entity.copper_golem.no": "Copper Golem harrumphs",
   "subtitles.entity.copper_golem.death": "Copper Golem dies",
-  "subtitles.entity.copper_golem.whirl": "Gear whirls"
+  "subtitles.entity.copper_golem.whirl": "Gear whirls",
+
+  "tag.block.c.copper_lightning_rods": "Copper Lightning Rods",
+  "tag.block.copper_golem.copper_buttons": "Copper Buttons",
+  "tag.block.copper_golem.copper_pressure_plates": "Copper Pressure Plates",
+  "tag.block.copper_golem.waxed_copper_buttons": "Waxed Copper Buttons",
+  "tag.block.copper_golem.waxed_copper_pressure_plates": "Waxed Copper Pressure Plates",
+  "tag.block.copper_golem.copper_golem_materials": "Copper Golem Materials",
+
+  "tag.item.copper_golem.copper_buttons": "Copper Buttons",
+  "tag.item.copper_golem.copper_pressure_plates": "Copper Pressure Plates",
+  "tag.item.copper_golem.waxed_copper_buttons": "Waxed Copper Buttons",
+  "tag.item.copper_golem.waxed_copper_pressure_plates": "Waxed Copper Pressure Plates"
 }
