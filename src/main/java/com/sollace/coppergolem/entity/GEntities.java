@@ -21,6 +21,6 @@ public interface GEntities {
     }
 
     static void bootstrap() {
-        FabricDefaultAttributeRegistry.register(COPPER_GOLEM, CopperGolemEntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(COPPER_GOLEM, CopperGolemEntity.createGolemAttributes());
     }
 }
