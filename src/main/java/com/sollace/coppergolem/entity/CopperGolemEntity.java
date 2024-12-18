@@ -13,6 +13,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LightningEntity;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
@@ -104,10 +105,10 @@ public class CopperGolemEntity extends GolemEntity {
 
     public static DefaultAttributeContainer.Builder createGolemAttributes() {
         return createMobAttributes()
-                .add(EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, 4.5)
-                .add(EntityAttributes.PLAYER_BLOCK_BREAK_SPEED)
-                .add(EntityAttributes.PLAYER_SUBMERGED_MINING_SPEED)
-                .add(EntityAttributes.PLAYER_MINING_EFFICIENCY);
+                .add(EntityAttributes.BLOCK_INTERACTION_RANGE, 4.5)
+                .add(EntityAttributes.BLOCK_BREAK_SPEED)
+                .add(EntityAttributes.SUBMERGED_MINING_SPEED)
+                .add(EntityAttributes.MINING_EFFICIENCY);
     }
 
     CopperGolemEntity(EntityType<CopperGolemEntity> type, World world) {
@@ -169,7 +170,7 @@ public class CopperGolemEntity extends GolemEntity {
     }
 
     @Override
-    protected void loot(ItemEntity item) {
+    protected void loot(ServerWorld world, ItemEntity item) {
 
         ItemStack stack = item.getStack();
 
@@ -237,7 +238,7 @@ public class CopperGolemEntity extends GolemEntity {
     }
 
     public double getArmReach() {
-        return getWidth() * 2 + getAttributeValue(EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE);
+        return getWidth() * 2 + getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE);
     }
 
     public boolean isWigglingNose() {
@@ -270,7 +271,7 @@ public class CopperGolemEntity extends GolemEntity {
         ItemStack heldItem = this.getMainHandStack();
         float speed = heldItem.getMiningSpeedMultiplier(block) * 0.67F;
         if (speed > 1) {
-            speed += getAttributeValue(EntityAttributes.PLAYER_MINING_EFFICIENCY);
+            speed += getAttributeValue(EntityAttributes.MINING_EFFICIENCY);
         }
         if (StatusEffectUtil.hasHaste(this)) {
             speed *= 1.0f + (float)(StatusEffectUtil.getHasteAmplifier(this) + 1) * 0.2f;
@@ -284,9 +285,9 @@ public class CopperGolemEntity extends GolemEntity {
             });
         }
 
-        speed *= (float)this.getAttributeValue(EntityAttributes.PLAYER_BLOCK_BREAK_SPEED);
+        speed *= (float)this.getAttributeValue(EntityAttributes.BLOCK_BREAK_SPEED);
         if (isSubmergedIn(FluidTags.WATER)) {
-            speed *= (float)getAttributeInstance(EntityAttributes.PLAYER_SUBMERGED_MINING_SPEED).getValue();
+            speed *= (float)getAttributeInstance(EntityAttributes.SUBMERGED_MINING_SPEED).getValue();
         }
         if (!isOnGround()) {
             speed /= 5F;
@@ -477,7 +478,7 @@ public class CopperGolemEntity extends GolemEntity {
         prevBodyYaw = bodyYaw;
         stepBobbingAmount = tag.getFloat("stepBobbingAmount");
         limbAnimator.setSpeed(0);
-        limbAnimator.updateLimbs(tag.getFloat("limbAngle") - limbAnimator.getPos(), 1);
+        limbAnimator.updateLimbs(tag.getFloat("limbAngle") - limbAnimator.getPos(), 0.4F, isBaby() ? 3 : 1);
         handSwingProgress = tag.getFloat("handSwingProgress");
         lastHandSwingProgress = handSwingProgress;
     }
@@ -486,7 +487,7 @@ public class CopperGolemEntity extends GolemEntity {
     protected void updateLimbs(float posDelta) {
         if (inanimate) {
             limbAnimator.setSpeed(0);
-            limbAnimator.updateLimbs(0, 0);
+            limbAnimator.updateLimbs(0, 0, 0);
             return;
         }
         super.updateLimbs(posDelta);
@@ -587,7 +588,7 @@ public class CopperGolemEntity extends GolemEntity {
         return 1.8F;
     }
 
-    public static boolean tryBuild(World world, BlockPos pos) {
+    public static boolean tryBuild(ServerWorld world, BlockPos pos) {
         BlockPattern.Result result = PATTERN.searchAround(world, pos);
         if (result == null) {
             return false;
@@ -611,7 +612,7 @@ public class CopperGolemEntity extends GolemEntity {
             world.syncWorldEvent(WorldEvents.BLOCK_BROKEN, position.getBlockPos(), Block.getRawIdFromState(position.getBlockState()));
         });
 
-        CopperGolemEntity golem = GEntities.COPPER_GOLEM.create(world);
+        CopperGolemEntity golem = GEntities.COPPER_GOLEM.create(world, SpawnReason.TRIGGERED);
         BlockPos center = result.translate(0, 1, 0).getBlockPos();
         golem.refreshPositionAndAngles(center.getX() + 0.5, center.getY() + 0.1, center.getZ() + 0.5, result.getForwards().asRotation(), 0);
         golem.bodyYaw = result.getForwards().asRotation();

@@ -1,9 +1,7 @@
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
-    {
-      "item": "minecraft:copper_ingot"
-    }
+    "minecraft:copper_ingot"
   ],
   "result": {
     "id": "copper_golem:copper_button"

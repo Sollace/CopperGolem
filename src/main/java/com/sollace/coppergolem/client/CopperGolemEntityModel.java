@@ -6,16 +6,16 @@ import net.minecraft.client.model.ModelPartBuilder;
 import net.minecraft.client.model.ModelPartData;
 import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
+import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.model.EntityModelPartNames;
-import net.minecraft.client.render.entity.model.SinglePartEntityModel;
-import net.minecraft.util.Hand;
+import net.minecraft.client.render.entity.model.ModelWithArms;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.EntityPose;
+import net.minecraft.util.Arm;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
 
-import com.sollace.coppergolem.entity.CopperGolemEntity;
-
-public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEntity> {
-
-    private final ModelPart root;
+public class CopperGolemEntityModel extends EntityModel<CopperGolemEntityRenderer.State> implements ModelWithArms {
 
     private final ModelPart body;
     private final ModelPart head;
@@ -27,10 +27,8 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
     private final ModelPart rightLeg;
     private final ModelPart leftLeg;
 
-    private float reachAmount;
-
     public CopperGolemEntityModel(ModelPart root) {
-        this.root = root;
+        super(root);
         this.body = root.getChild(EntityModelPartNames.BODY);
         this.head = body.getChild(EntityModelPartNames.HEAD);
         this.nose = head.getChild(EntityModelPartNames.NOSE);
@@ -45,7 +43,7 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
         ModelPartData root = data.getRoot();
 
         ModelPartData body = root.addChild(EntityModelPartNames.BODY, ModelPartBuilder.create()
-                .uv(0, 13).cuboid(-4, -7, -3, 8, 7, 5), ModelTransform.NONE);
+                .uv(0, 13).cuboid(-4, -7, -3, 8, 7, 5), ModelTransform.pivot(0, 20, 0));
 
         body.addChild(EntityModelPartNames.HEAD, ModelPartBuilder.create()
                         .uv(36, 31).cuboid(-1, -1, -1.5F, 2, 2, 2)
@@ -60,116 +58,96 @@ public class CopperGolemEntityModel extends SinglePartEntityModel<CopperGolemEnt
                 .uv(16, 26).cuboid(0, -1, -2, 2, 10, 3), ModelTransform.pivot(-6, -6, 0));
         root.addChild(EntityModelPartNames.RIGHT_LEG, ModelPartBuilder.create()
                 .uv(26, 9).cuboid(-2, 0, -3, 4, 3, 4)
-                .uv(23, 0).cuboid(-2, 3, -3, 4, 1, 5), ModelTransform.pivot(-2, 0, 0));
+                .uv(23, 0).cuboid(-2, 3, -3, 4, 1, 5), ModelTransform.pivot(-2, 20, 0));
         root.addChild(EntityModelPartNames.LEFT_LEG, ModelPartBuilder.create()
                 .uv(0, 25).cuboid(-2, 0, -2, 4, 3, 4)
-                .uv(21, 20).cuboid(-2, 3, -2, 4, 1, 5), ModelTransform.pivot(2, 0, -1));
+                .uv(21, 20).cuboid(-2, 3, -2, 4, 1, 5), ModelTransform.pivot(2, 20, -1));
 
         return TexturedModelData.of(data, 64, 64);
     }
 
     @Override
-    public ModelPart getPart() {
-        return root;
-    }
+    public void setAngles(CopperGolemEntityRenderer.State state) {
+        super.setAngles(state);
+        root.yaw = -MathHelper.PI;
+        head.yaw = state.yawDegrees;
+        head.pitch = state.pitch;
 
-    @Override
-    public void animateModel(CopperGolemEntity entity, float limbAngle, float limbDistance, float tickDelta) {
-        float rm = (entity.getReachAmount(tickDelta) / 200F);
-        reachAmount = 1 - Math.min(1, (float)Math.sin(rm * Math.PI) * 12);
-    }
+        float sinAngle = (float)Math.sin(state.handSwingProgress * MathHelper.PI);
 
-    @Override
-    public void setAngles(CopperGolemEntity entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
-
-        if (entity.inanimate) {
-            limbAngle = entity.limbAnimator.getPos(0);
-            animationProgress = 1;
-        }
-
-        root.yaw = -(float)Math.PI;
-        root.pivotY = 20;
-
-        float headSpinTime = (float)entity.getHeadSpinTime() / 10;
-
-        float maxRotation = 2 * (float)Math.PI;
-
-        head.yaw = headYaw * 0.017453292F + MathHelper.lerp(headSpinTime, 0, maxRotation);
-        head.pitch = headSpinTime > 0 ? 0 : -headPitch * 0.017453292F;
-        head.roll = 0;
-
-        handSwingProgress *= Math.PI;
-
-        float sinAngle = (float)Math.sin(handSwingProgress);
-
-        if (riding) {
+        if (state.isInPose(EntityPose.SITTING)) {
             rightLeg.pitch = 1.5F;
             rightLeg.yaw = -0.5F;
             leftLeg.pitch = 1.5F;
             leftLeg.yaw = 0.5F;
 
-            rightArm.pitch = 1.25F + 1.125F * MathHelper.wrap(limbAngle, 13) * limbDistance;
-            leftArm.pitch = 1.25F + 1.125F * MathHelper.wrap(limbAngle, 13) * limbDistance;
+            rightArm.pitch = 1.25F + 1.125F * MathHelper.wrap(state.limbFrequency, 13) * state.limbAmplitudeMultiplier;
+            leftArm.pitch = 1.25F + 1.125F * MathHelper.wrap(state.limbFrequency, 13) * state.limbAmplitudeMultiplier;
         } else {
             body.pitch = -MathHelper.clamp(sinAngle, 0, 0.25F);
 
             rightLeg.yaw = 0;
-            rightLeg.pitch = MathHelper.cos(limbAngle * 0.6662F) * 1.4F * limbDistance;
+            rightLeg.pitch = MathHelper.cos(state.limbFrequency * 0.6662F) * 1.4F * state.limbAmplitudeMultiplier;
             leftLeg.yaw = 0;
-            leftLeg.pitch = MathHelper.cos(limbAngle * 0.6662F + (float)Math.PI) * 1.4F * limbDistance;
+            leftLeg.pitch = MathHelper.cos(state.limbFrequency * 0.6662F + (float)Math.PI) * 1.4F * state.limbAmplitudeMultiplier;
 
-            if (entity.isChasing()) {
-                rightArm.pitch = 1.25F + MathHelper.sin(animationProgress / 2) / 10F;
-                leftArm.pitch = 1.25F + MathHelper.cos(animationProgress / 2) / 10F;
+            if (state.chasing) {
+                rightArm.pitch = 1.25F + MathHelper.sin(state.age / 2) / 10F;
+                leftArm.pitch = 1.25F + MathHelper.cos(state.age / 2) / 10F;
             } else {
-                rightArm.pitch = 1.5F * MathHelper.wrap(limbAngle, 13) * limbDistance;
-                rightArm.yaw = -0.5F * MathHelper.wrap(limbAngle, 13) * limbDistance;
-                leftArm.pitch = -1.5F * MathHelper.wrap(limbAngle, 13) * limbDistance;
-                leftArm.yaw = 0.5F * MathHelper.wrap(limbAngle, 13) * limbDistance;
+                rightArm.pitch = 1.5F * MathHelper.wrap(state.limbFrequency, 13) * state.limbAmplitudeMultiplier;
+                rightArm.yaw = -0.5F * MathHelper.wrap(state.limbFrequency, 13) * state.limbAmplitudeMultiplier;
+                leftArm.pitch = -1.5F * MathHelper.wrap(state.limbFrequency, 13) * state.limbAmplitudeMultiplier;
+                leftArm.yaw = 0.5F * MathHelper.wrap(state.limbFrequency, 13) * state.limbAmplitudeMultiplier;
             }
         }
 
-        if (!entity.getStackInHand(Hand.MAIN_HAND).isEmpty()) {
+        if (!state.getMainHandStack().isEmpty()) {
             rightArm.pitch += 0.5F - MathHelper.clamp(sinAngle, 0, 1.5F);
         } else {
             rightArm.pitch += MathHelper.clamp(sinAngle, 0, 1.5F);
             leftArm.pitch += MathHelper.clamp(sinAngle, 0, 1.5F);
         }
 
-        if (reachAmount < 1) {
-            float ani = 1 - reachAmount;
+        if (state.reachAmount < 1) {
+            float ani = 1 - state.reachAmount;
             float armReachAmnt = ani * 2.5F;
-            float wobble = ani * ((float)Math.sin(animationProgress / 9F) / 9F);
+            float wobble = ani * ((float)Math.sin(state.age / 9F) / 9F);
 
-            leftArm.pitch *= reachAmount;
+            leftArm.pitch *= state.reachAmount;
             leftArm.pitch += armReachAmnt + wobble;
-            rightArm.pitch *= reachAmount;
+            rightArm.pitch *= state.reachAmount;
             rightArm.pitch += armReachAmnt - wobble;
-            leftArm.roll *= reachAmount;
+            leftArm.roll *= state.reachAmount;
             leftArm.roll += wobble;
-            rightArm.roll *= reachAmount;
+            rightArm.roll *= state.reachAmount;
             rightArm.roll -= wobble;
-            head.pitch *= reachAmount;
+            head.pitch *= state.reachAmount;
             head.pitch += ani * 0.8F;
-            head.roll *= reachAmount;
-            head.roll += ani * ((float)Math.cos(animationProgress / 9F) / 9F);
+            head.roll *= state.reachAmount;
+            head.roll += ani * ((float)Math.cos(state.age / 9F) / 9F);
 
-            body.pitch *= reachAmount;
+            body.pitch *= state.reachAmount;
             body.pitch += ani * 0.3F;
-            leftLeg.pitch *= reachAmount;
+            leftLeg.pitch *= state.reachAmount;
             leftLeg.pitch -= ani * 0.1F;
         } else {
-            float flailAmount = MathHelper.clamp((float)entity.getVelocity().y, 0, 0.5F);
-
-            leftArm.roll = flailAmount;
-            rightArm.roll = -flailAmount;
+            leftArm.roll = state.armsRoll;
+            rightArm.roll = -state.armsRoll;
         }
 
-        if (!entity.isWigglingNose()) {
-            nose.roll = 0;
-            nose.pitch = MathHelper.wrap(limbAngle, 13.0F) * limbDistance;
-        } else if (!entity.inanimate) {
-            nose.roll = MathHelper.sin(entity.age) / 3;
-        }
+        nose.roll = state.noseRoll;
+        nose.pitch = state.nosePitch;
+    }
+
+    @Override
+    public void setArmAngle(Arm arm, MatrixStack matrices) {
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-180));
+        matrices.translate(0, 1.3, 0);
+
+        //matrices.translate(-0.5, 1.4, 0.3);
+        rightArm.rotate(matrices);
+        //matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180));
     }
 }

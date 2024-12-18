@@ -14,6 +14,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.registry.Registries;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.GameRules;
 
 import com.sollace.coppergolem.Main;
@@ -49,7 +50,7 @@ class UseItemInteraction extends BlockInteraction implements LearnedDuties.Recei
     public boolean perform(CopperGolemEntity entity, BlockPos pos, BlockState state) {
         ItemStack stack = entity.getStackInHand(Hand.MAIN_HAND);
 
-        if (!entity.getWorld().getGameRules().get(GameRules.DO_MOB_GRIEFING).get()) {
+        if (!((ServerWorld)entity.getWorld()).getGameRules().get(GameRules.DO_MOB_GRIEFING).get()) {
             return false;
         }
 
@@ -75,7 +76,7 @@ class UseItemInteraction extends BlockInteraction implements LearnedDuties.Recei
                 }
         }
 
-        if (result.shouldSwingHand()) {
+        if (result instanceof ActionResult.Success) {
             entity.swingHand(Hand.MAIN_HAND);
         }
 

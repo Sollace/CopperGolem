@@ -1,18 +1,13 @@
 package com.sollace.coppergolem.client;
 
 import net.minecraft.block.Oxidizable.OxidationLevel;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.BipedEntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory.Context;
 import net.minecraft.client.render.entity.MobEntityRenderer;
-import net.minecraft.client.render.entity.feature.FeatureRenderer;
-import net.minecraft.client.render.entity.feature.FeatureRendererContext;
-import net.minecraft.client.render.item.HeldItemRenderer;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.render.entity.feature.HeldItemFeatureRenderer;
+import net.minecraft.client.render.entity.state.BipedEntityRenderState;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.MathHelper;
 
 import com.sollace.coppergolem.Main;
 import com.sollace.coppergolem.entity.CopperGolemEntity;
@@ -20,48 +15,53 @@ import com.sollace.coppergolem.entity.CopperGolemEntity;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CopperGolemEntityRenderer extends MobEntityRenderer<CopperGolemEntity, CopperGolemEntityModel> {
+public class CopperGolemEntityRenderer extends MobEntityRenderer<CopperGolemEntity, CopperGolemEntityRenderer.State, CopperGolemEntityModel> {
     private final Map<OxidationLevel, Identifier> textures = new HashMap<>();
 
     public CopperGolemEntityRenderer(Context ctx) {
         super(ctx, new CopperGolemEntityModel(CopperGolemEntityModel.getTexturedModelData().createModel()), 0.3F);
-        addFeature(new HeldItem(this, ctx.getHeldItemRenderer()));
+        addFeature(new HeldItemFeatureRenderer<>(this, ctx.getItemRenderer()));
     }
 
     @Override
-    public Identifier getTexture(CopperGolemEntity entity) {
-        return textures.computeIfAbsent(entity.getDegradationLevel(), l -> Main.id("textures/entity/copper_golem/copper_golem_" + l.name().toLowerCase() + ".png"));
+    public Identifier getTexture(State state) {
+        return textures.computeIfAbsent(state.degregationLevel, l -> Main.id("textures/entity/copper_golem/copper_golem_" + l.name().toLowerCase() + ".png"));
     }
 
-    public static class HeldItem extends FeatureRenderer<CopperGolemEntity, CopperGolemEntityModel> {
+    @Override
+    public State createRenderState() {
+        return new State();
+    }
 
-        private final HeldItemRenderer heldItemRenderer;
-
-        public HeldItem(FeatureRendererContext<CopperGolemEntity, CopperGolemEntityModel> context, HeldItemRenderer heldItemRenderer) {
-            super(context);
-            this.heldItemRenderer = heldItemRenderer;
+    public void updateRenderState(CopperGolemEntity entity, State state, float tickDelta) {
+        if (entity.inanimate) {
+            tickDelta = 0;
         }
+        super.updateRenderState(entity, state, tickDelta);
+        BipedEntityRenderer.updateBipedRenderState(entity, state, tickDelta);
+        state.degregationLevel = entity.getDegradationLevel();
+        state.inanimate = entity.inanimate;
+        state.chasing = entity.isChasing();
+        state.headSpinTime = entity.getHeadSpinTime() / 10F;
+        state.yawDegrees *= 0.017453292F + MathHelper.lerp(state.headSpinTime, 0, MathHelper.TAU);
+        state.pitch = state.headSpinTime > 0 ? 0 : -state.pitch * 0.017453292F;
+        state.armsRoll = MathHelper.clamp((float)entity.getVelocity().y, 0, 0.5F);
+        state.reachAmount = 1 - Math.min(1, (float)MathHelper.sin((entity.getReachAmount(tickDelta) / 200F) * MathHelper.PI) * 12);
+        boolean noseWiggling = entity.isWigglingNose();
 
-        @Override
-        public void render(MatrixStack matrices, VertexConsumerProvider vertices, int light, CopperGolemEntity entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
+        state.noseRoll = noseWiggling && !state.inanimate ? MathHelper.sin(state.age) / 3F : 0;
+        state.nosePitch = noseWiggling ? 0 : MathHelper.wrap(state.limbFrequency, 13F) * state.limbAmplitudeMultiplier;
+    }
 
-            ItemStack item = entity.getEquippedStack(EquipmentSlot.MAINHAND);
-            if (item.isEmpty()) {
-                return;
-            }
+    public static class State extends BipedEntityRenderState {
+        public OxidationLevel degregationLevel;
+        public boolean inanimate;
+        public boolean chasing;
+        public float headSpinTime;
+        public float armsRoll;
+        public float reachAmount;
 
-            matrices.push();
-
-            getContextModel().getPart().rotate(matrices);
-            getContextModel().rightArm.rotate(matrices);
-            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90));
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180));
-
-            boolean isLeft = true;
-            matrices.translate((float)(isLeft ? -1 : 1) / 16F, 1 / 16F, 5 / 16F);
-
-            heldItemRenderer.renderItem(entity, item, ModelTransformationMode.THIRD_PERSON_RIGHT_HAND, false, matrices, vertices, light);
-            matrices.pop();
-        }
+        public float nosePitch;
+        public float noseRoll;
     }
 }

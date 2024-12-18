@@ -6,6 +6,7 @@ import net.minecraft.block.BlockSetType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Oxidizable;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -48,6 +49,8 @@ public class CopperButtonBlock extends ButtonBlock {
         world.scheduleBlockTick(pos, this, getCustomPressTicks());
         playClickSound(player, world, pos, true);
         world.emitGameEvent(player, GameEvent.BLOCK_ACTIVATE, pos);
-        CopperGolemEntity.tryBuild(world, pos.offset(state.get(FACING).getOpposite()));
+        if (world instanceof ServerWorld sw) {
+            CopperGolemEntity.tryBuild(sw, pos.offset(state.get(FACING).getOpposite()));
+        }
     }
 }

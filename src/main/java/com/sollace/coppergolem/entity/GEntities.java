@@ -8,6 +8,8 @@ import net.minecraft.entity.SpawnGroup;
 import com.sollace.coppergolem.Main;
 
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.Registries;
 
 public interface GEntities {
@@ -17,7 +19,8 @@ public interface GEntities {
             .dimensions(0.6F, 0.99F));
 
     private static <T extends Entity> EntityType<T> register(String name, EntityType.Builder<T> builder) {
-        return Registry.register(Registries.ENTITY_TYPE, Main.id(name), builder.build(name));
+        RegistryKey<EntityType<?>> key = RegistryKey.of(RegistryKeys.ENTITY_TYPE, Main.id(name));
+        return Registry.register(Registries.ENTITY_TYPE, key, builder.build(key));
     }
 
     static void bootstrap() {

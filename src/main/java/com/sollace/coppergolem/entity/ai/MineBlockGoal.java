@@ -7,6 +7,7 @@ import net.minecraft.command.argument.EntityAnchorArgumentType.EntityAnchor;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Hand;
@@ -101,7 +102,7 @@ public class MineBlockGoal extends Goal {
             if (progress > 1) {
                 Block block = state.getBlock();
 
-                if (mob.getWorld().getGameRules().get(GameRules.DO_MOB_GRIEFING).get()) {
+                if (((ServerWorld)mob.getWorld()).getGameRules().get(GameRules.DO_MOB_GRIEFING).get()) {
                     PlayerEntity nearestPlayer = mob.getWorld().getClosestPlayer(mob, 10);
                     mob.getWorld().syncWorldEvent(null, WorldEvents.BLOCK_BROKEN, pos, Block.getRawIdFromState(state));
                     if (nearestPlayer == null) {

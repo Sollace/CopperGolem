@@ -13,12 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.Registries;
 
 public interface GItems {
     static Item register(String name, Block block) {
-        return Registry.register(Registries.ITEM, Main.id(name), new BlockItem(block, new Item.Settings()));
+        RegistryKey<Item> key = RegistryKey.of(RegistryKeys.ITEM, Main.id(name));
+        return Registry.register(Registries.ITEM, key, new BlockItem(block, new Item.Settings().registryKey(key).useBlockPrefixedTranslationKey()));
     }
 
     static void bootstrap() {
