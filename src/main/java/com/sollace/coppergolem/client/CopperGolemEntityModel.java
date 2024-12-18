@@ -144,10 +144,7 @@ public class CopperGolemEntityModel extends EntityModel<CopperGolemEntityRendere
     public void setArmAngle(Arm arm, MatrixStack matrices) {
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-180));
         matrices.translate(0, 1.3, 0);
-
-        //matrices.translate(-0.5, 1.4, 0.3);
         rightArm.rotate(matrices);
-        //matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90));
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180));
     }
 }

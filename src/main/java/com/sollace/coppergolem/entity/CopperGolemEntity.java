@@ -354,30 +354,32 @@ public class CopperGolemEntity extends GolemEntity {
         super.tickMovement();
         tickHandSwing();
 
-        if (!waxed && random.nextFloat() < 0.05688889F) {
-            setOxidation(getOxidation() + 1);
-        }
-
-        if (!inanimate) {
-            if (isWigglingNose()) {
-                dataTracker.set(WIGGLING_NOSE_TIME, dataTracker.get(WIGGLING_NOSE_TIME) - 1);
+        if (!getWorld().isClient) {
+            if (!waxed && random.nextFloat() < 0.05688889F) {
+                setOxidation(getOxidation() + 1);
             }
 
-            int headSpinTime = getHeadSpinTime();
-
-            if (headSpinTime > 0) {
-                if (headSpinTime == 10) {
-                    playSound(GSounds.ENTITY_COPPER_GOLEM_WHIRL, getSoundVolume(), getSoundPitch());
+            if (!inanimate) {
+                if (isWigglingNose()) {
+                    dataTracker.set(WIGGLING_NOSE_TIME, dataTracker.get(WIGGLING_NOSE_TIME) - 1);
                 }
-                dataTracker.set(SPINNING_HEAD_TIME, headSpinTime - 1);
-            }
 
-            if (getRandom().nextInt(1200) == 0) {
-                wiggleNose();
-            }
+                int headSpinTime = getHeadSpinTime();
 
-            if (getNavigation().isIdle() && getRandom().nextInt(1600) == 0) {
-                spinHead();
+                if (headSpinTime > 0) {
+                    if (headSpinTime == 10) {
+                        playSound(GSounds.ENTITY_COPPER_GOLEM_WHIRL, getSoundVolume(), getSoundPitch());
+                    }
+                    dataTracker.set(SPINNING_HEAD_TIME, headSpinTime - 1);
+                }
+
+                if (getRandom().nextInt(1200) == 0) {
+                    wiggleNose();
+                }
+
+                if (getNavigation().isIdle() && getRandom().nextInt(1600) == 0) {
+                    spinHead();
+                }
             }
         }
     }
