@@ -33,11 +33,11 @@ public interface GBlocks {
     }
 
     static void bootstrap() {
-        var set = List.of(
-            Map.entry(Oxidizable.OxidationLevel.UNAFFECTED, MapColor.ORANGE),
-            Map.entry(Oxidizable.OxidationLevel.EXPOSED, MapColor.TERRACOTTA_LIGHT_GRAY),
-            Map.entry(Oxidizable.OxidationLevel.WEATHERED, MapColor.DARK_AQUA),
-            Map.entry(Oxidizable.OxidationLevel.OXIDIZED, MapColor.TEAL)
+        var set = Map.of(
+            Oxidizable.OxidationLevel.UNAFFECTED, MapColor.ORANGE,
+            Oxidizable.OxidationLevel.EXPOSED, MapColor.TERRACOTTA_LIGHT_GRAY,
+            Oxidizable.OxidationLevel.WEATHERED, MapColor.DARK_AQUA,
+            Oxidizable.OxidationLevel.OXIDIZED, MapColor.TEAL
         );
 
         // generate buttons
@@ -53,7 +53,7 @@ public interface GBlocks {
         );
     }
 
-    static <T extends Block> void generateCopperBlocks(List<Map.Entry<Oxidizable.OxidationLevel, MapColor>> types, String name,
+    static <T extends Block> void generateCopperBlocks(Map<Oxidizable.OxidationLevel, MapColor> types, String name,
             BiFunction<MapColor, AbstractBlock.Settings, AbstractBlock.Settings> settingsFunc,
             BiFunction<Oxidizable.OxidationLevel, AbstractBlock.Settings, T> normalMapper,
             BiFunction<Oxidizable.OxidationLevel, AbstractBlock.Settings, T> waxedMapper) {
@@ -63,12 +63,12 @@ public interface GBlocks {
         );
     }
 
-    static <T extends Block> void generateCopperBlocks(List<Map.Entry<Oxidizable.OxidationLevel, MapColor>> types, String name,
+    static <T extends Block> void generateCopperBlocks(Map<Oxidizable.OxidationLevel, MapColor> types, String name,
             Function<Map.Entry<Oxidizable.OxidationLevel, MapColor>, Function<AbstractBlock.Settings, T>> normalMapper,
             Function<Map.Entry<Oxidizable.OxidationLevel, MapColor>, Function<AbstractBlock.Settings, T>> waxedMapper) {
 
         int setId = COPPER_BLOCKS.size();
-        Block[] oxidizationStates = types.stream().map(o -> {
+        Block[] oxidizationStates = types.entrySet().stream().map(o -> {
             var id = o.getKey() == Oxidizable.OxidationLevel.UNAFFECTED ? "" : o.getKey().name().toLowerCase() + "_";
             var normal = register(setId, id + "copper_" + name, normalMapper.apply(o));
             var waxed = register(setId + 1, "waxed_" + id + "copper_" + name, waxedMapper.apply(o));
