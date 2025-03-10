@@ -102,7 +102,7 @@ public class CopperGolemEntityModel extends EntityModel<CopperGolemEntityRendere
             }
         }
 
-        if (!state.getMainHandStack().isEmpty()) {
+        if (!state.getMainHandItemState().isEmpty()) {
             rightArm.pitch += 0.5F - MathHelper.clamp(sinAngle, 0, 1.5F);
         } else {
             rightArm.pitch += MathHelper.clamp(sinAngle, 0, 1.5F);

@@ -1,6 +1,7 @@
 package com.sollace.coppergolem.client;
 
 import net.minecraft.block.Oxidizable.OxidationLevel;
+import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.render.entity.BipedEntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory.Context;
 import net.minecraft.client.render.entity.MobEntityRenderer;
@@ -18,9 +19,12 @@ import java.util.Map;
 public class CopperGolemEntityRenderer extends MobEntityRenderer<CopperGolemEntity, CopperGolemEntityRenderer.State, CopperGolemEntityModel> {
     private final Map<OxidationLevel, Identifier> textures = new HashMap<>();
 
+    private final ItemModelManager manager;
+
     public CopperGolemEntityRenderer(Context ctx) {
         super(ctx, new CopperGolemEntityModel(CopperGolemEntityModel.getTexturedModelData().createModel()), 0.3F);
-        addFeature(new HeldItemFeatureRenderer<>(this, ctx.getItemRenderer()));
+        addFeature(new HeldItemFeatureRenderer<>(this));
+        manager = ctx.getItemModelManager();
     }
 
     @Override
@@ -38,7 +42,7 @@ public class CopperGolemEntityRenderer extends MobEntityRenderer<CopperGolemEnti
             tickDelta = 0;
         }
         super.updateRenderState(entity, state, tickDelta);
-        BipedEntityRenderer.updateBipedRenderState(entity, state, tickDelta);
+        BipedEntityRenderer.updateBipedRenderState(entity, state, tickDelta, manager);
         state.degregationLevel = entity.getDegradationLevel();
         state.inanimate = entity.inanimate;
         state.chasing = entity.isChasing();

@@ -616,9 +616,9 @@ public class CopperGolemEntity extends GolemEntity {
 
         CopperGolemEntity golem = GEntities.COPPER_GOLEM.create(world, SpawnReason.TRIGGERED);
         BlockPos center = result.translate(0, 1, 0).getBlockPos();
-        golem.refreshPositionAndAngles(center.getX() + 0.5, center.getY() + 0.1, center.getZ() + 0.5, result.getForwards().asRotation(), 0);
-        golem.bodyYaw = result.getForwards().asRotation();
-        golem.headYaw = result.getForwards().asRotation();
+        golem.refreshPositionAndAngles(center.getX() + 0.5, center.getY() + 0.1, center.getZ() + 0.5, result.getForwards().getPositiveHorizontalDegrees(), 0);
+        golem.bodyYaw = result.getForwards().getPositiveHorizontalDegrees();
+        golem.headYaw = result.getForwards().getPositiveHorizontalDegrees();
         golem.setDegradationLevel(oxidation[0]);
 
         world.spawnEntity(golem);
