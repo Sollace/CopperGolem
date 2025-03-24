@@ -6,6 +6,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Oxidizable;
 import net.minecraft.block.PressurePlateBlock;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCollisionHandler;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -28,7 +29,7 @@ public class CopperPressurePlateBlock extends PressurePlateBlock {
 
     /* THANKS MOJANK */
     @Override
-    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+    protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         int i = this.getRedstoneOutput(state);
         if (i > 0) {
             this.updatePlateState(null, world, pos, state, i);
@@ -36,7 +37,7 @@ public class CopperPressurePlateBlock extends PressurePlateBlock {
     }
 
     @Override
-    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+    protected void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity, EntityCollisionHandler handler) {
         if (world.isClient) {
             return;
         }

@@ -47,14 +47,14 @@ public class CopperGolemEntityRenderer extends MobEntityRenderer<CopperGolemEnti
         state.inanimate = entity.inanimate;
         state.chasing = entity.isChasing();
         state.headSpinTime = entity.getHeadSpinTime() / 10F;
-        state.yawDegrees *= 0.017453292F + MathHelper.lerp(state.headSpinTime, 0, MathHelper.TAU);
+        state.relativeHeadYaw *= 0.017453292F + MathHelper.lerp(state.headSpinTime, 0, MathHelper.TAU);
         state.pitch = state.headSpinTime > 0 ? 0 : -state.pitch * 0.017453292F;
         state.armsRoll = MathHelper.clamp((float)entity.getVelocity().y, 0, 0.5F);
         state.reachAmount = 1 - Math.min(1, (float)MathHelper.sin((entity.getReachAmount(tickDelta) / 200F) * MathHelper.PI) * 12);
         boolean noseWiggling = entity.isWigglingNose();
 
         state.noseRoll = noseWiggling && !state.inanimate ? MathHelper.sin(state.age) / 3F : 0;
-        state.nosePitch = noseWiggling ? 0 : MathHelper.wrap(state.limbFrequency, 13F) * state.limbAmplitudeMultiplier;
+        state.nosePitch = noseWiggling ? 0 : MathHelper.wrap(state.limbSwingAnimationProgress, 13F) * state.limbSwingAmplitude;
     }
 
     public static class State extends BipedEntityRenderState {

@@ -2,7 +2,6 @@ package com.sollace.coppergolem.entity.ai;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtLong;
 import net.minecraft.util.math.BlockPos;
@@ -92,10 +91,12 @@ public abstract class PositionFinder {
 
     public void readNbt(NbtCompound tag) {
         knownPositions.clear();
-        tag.getList("knownPositions", NbtElement.LONG_TYPE).stream().map(l -> BlockPos.fromLong(((NbtLong)l).longValue())).forEach(knownPositions::add);
-        maxScanDistance = tag.getInt("maxScanDistance");
-        scanCounter = tag.getInt("scanCounter");
-        minWalkDistance = tag.getInt("minWalkDistance");
+        tag.getList("knownPositions").stream()
+            .flatMap(l -> l.asLong().stream())
+            .map(BlockPos::fromLong).forEach(knownPositions::add);
+        maxScanDistance = tag.getInt("maxScanDistance", 0);
+        scanCounter = tag.getInt("scanCounter", 0);
+        minWalkDistance = tag.getInt("minWalkDistance", 0);
     }
 
     public void writeNbt(NbtCompound tag) {

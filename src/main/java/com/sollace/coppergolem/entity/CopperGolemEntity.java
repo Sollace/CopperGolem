@@ -31,7 +31,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
@@ -183,14 +182,14 @@ public class CopperGolemEntity extends GolemEntity {
                 if (canTake >= stack.getCount()) {
                     triggerItemPickedUpByEntityCriteria(item);
                     equipStack(EquipmentSlot.MAINHAND, stack);
-                    handDropChances[EquipmentSlot.MAINHAND.getEntitySlotId()] = 2;
+                    setEquipmentDropChance(EquipmentSlot.MAINHAND, 2);
                     sendPickup(item, stack.getCount());
                     item.discard();
                 } else {
                     item.setStack(stack.split(stack.getCount() - canTake));
                     current.increment(canTake);
                     equipStack(EquipmentSlot.MAINHAND, stack);
-                    handDropChances[EquipmentSlot.MAINHAND.getEntitySlotId()] = 2;
+                    setEquipmentDropChance(EquipmentSlot.MAINHAND, 2);
                 }
             }
         }
@@ -444,7 +443,7 @@ public class CopperGolemEntity extends GolemEntity {
                 newStack.increment(heldStack.getCount());
                 equipStack(EquipmentSlot.MAINHAND, newStack);
                 playSound(SoundEvents.ITEM_ARMOR_EQUIP_CHAIN.value(), 1, 1);
-                handDropChances[EquipmentSlot.MAINHAND.getEntitySlotId()] = 2;
+                setEquipmentDropChance(EquipmentSlot.MAINHAND, 2);
                 swingHand(Hand.MAIN_HAND);
 
                 return ActionResult.SUCCESS;
@@ -470,18 +469,17 @@ public class CopperGolemEntity extends GolemEntity {
     }
 
     public Optional<NbtCompound> getPosing() {
-        NbtCompound tag = dataTracker.get(POSING);
-        return tag.contains("posing", NbtElement.COMPOUND_TYPE) ? Optional.of(tag.getCompound("posing")) : Optional.empty();
+        return dataTracker.get(POSING).getCompound("posing");
     }
 
     public void loadAngles(NbtCompound tag) {
-        setPitch(tag.getFloat("pitch"));
-        bodyYaw = tag.getFloat("bodyYaw");
-        prevBodyYaw = bodyYaw;
-        stepBobbingAmount = tag.getFloat("stepBobbingAmount");
+        setPitch(tag.getFloat("pitch", 0));
+        bodyYaw = tag.getFloat("bodyYaw", 0);
+        lastBodyYaw = bodyYaw;
+        distanceTraveled = tag.getFloat("stepBobbingAmount", 0);
         limbAnimator.setSpeed(0);
-        limbAnimator.updateLimbs(tag.getFloat("limbAngle") - limbAnimator.getPos(), 0.4F, isBaby() ? 3 : 1);
-        handSwingProgress = tag.getFloat("handSwingProgress");
+        limbAnimator.updateLimbs(tag.getFloat("limbAngle", 0) - limbAnimator.getAnimationProgress(), 0.4F, isBaby() ? 3 : 1);
+        handSwingProgress = tag.getFloat("handSwingProgress", 0);
         lastHandSwingProgress = handSwingProgress;
     }
 
@@ -499,8 +497,8 @@ public class CopperGolemEntity extends GolemEntity {
         NbtCompound tag = new NbtCompound();
         tag.putFloat("pitch", getPitch());
         tag.putFloat("bodyYaw", bodyYaw);
-        tag.putFloat("stepBobbingAmount", stepBobbingAmount);
-        tag.putFloat("limbAngle", limbAnimator.getPos());
+        tag.putFloat("stepBobbingAmount", distanceTraveled);
+        tag.putFloat("limbAngle", limbAnimator.getAnimationProgress());
         tag.putFloat("handSwingProgress", handSwingProgress);
         return tag;
     }
@@ -522,18 +520,19 @@ public class CopperGolemEntity extends GolemEntity {
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        setOxidation(nbt.getInt("oxidation"));
-        waxed = nbt.getBoolean("waxed");
+        setOxidation(nbt.getInt("oxidation", 0));
+        waxed = nbt.getBoolean("waxed", false);
 
         finders.clear();
-        NbtCompound modules = nbt.getCompound("interactionMemories");
-        modules.getKeys().forEach(block -> {
-            Identifier id = Identifier.tryParse(block);
-            if (id != null) {
-                finders.put(id, BlockInteraction.fromNbt(this, modules.getCompound(block)));
-            }
+        nbt.getCompound("interactionMemories").ifPresent(modules -> {
+            modules.getKeys().forEach(block -> {
+                Identifier id = Identifier.tryParse(block);
+                if (id != null) {
+                    finders.put(id, BlockInteraction.fromNbt(this, modules.getCompoundOrEmpty(block)));
+                }
+            });
         });
-        setPosing(nbt.contains("posing") ? Optional.of(nbt.getCompound("posing")) : Optional.empty());
+        setPosing(nbt.getCompound("posing"));
 
         getPosing().ifPresent(this::loadAngles);
     }
@@ -553,7 +552,7 @@ public class CopperGolemEntity extends GolemEntity {
 
     protected void produceParticles(ParticleEffect parameters) {
         for (int i = 0; i < 5; ++i) {
-            getWorld().addParticle(parameters,
+            getWorld().addParticleClient(parameters,
                     getParticleX(1), getRandomBodyY() + 1, getParticleZ(1),
                     random.nextGaussian() * 0.02,
                     random.nextGaussian() * 0.02,

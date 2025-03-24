@@ -43,25 +43,25 @@ public class CopperGolemEntityModel extends EntityModel<CopperGolemEntityRendere
         ModelPartData root = data.getRoot();
 
         ModelPartData body = root.addChild(EntityModelPartNames.BODY, ModelPartBuilder.create()
-                .uv(0, 13).cuboid(-4, -7, -3, 8, 7, 5), ModelTransform.pivot(0, 20, 0));
+                .uv(0, 13).cuboid(-4, -7, -3, 8, 7, 5), ModelTransform.origin(0, 20, 0));
 
         body.addChild(EntityModelPartNames.HEAD, ModelPartBuilder.create()
                         .uv(36, 31).cuboid(-1, -1, -1.5F, 2, 2, 2)
                         .uv(0, 0).cuboid(-4, -5, -4, 8, 5, 7)
                         .uv(26, 16).cuboid(-1, -7, -1.5F, 2, 2, 2)
-                        .uv(0, 32).cuboid(-1.5F, -10, -2, 3, 3, 3), ModelTransform.pivot(0, -6, 0))
+                        .uv(0, 32).cuboid(-1.5F, -10, -2, 3, 3, 3), ModelTransform.origin(0, -6, 0))
                 .addChild(EntityModelPartNames.NOSE, ModelPartBuilder.create()
-                        .uv(36, 26).cuboid(-1.5F, -1, 0, 2, 3, 2), ModelTransform.pivot(0.5F, -1, 3));
+                        .uv(36, 26).cuboid(-1.5F, -1, 0, 2, 3, 2), ModelTransform.origin(0.5F, -1, 3));
         body.addChild(EntityModelPartNames.RIGHT_ARM, ModelPartBuilder.create()
-                .uv(26, 26).cuboid(0, -1, -2, 2, 10, 3), ModelTransform.pivot(4, -6, 0));
+                .uv(26, 26).cuboid(0, -1, -2, 2, 10, 3), ModelTransform.origin(4, -6, 0));
         body.addChild(EntityModelPartNames.LEFT_ARM, ModelPartBuilder.create()
-                .uv(16, 26).cuboid(0, -1, -2, 2, 10, 3), ModelTransform.pivot(-6, -6, 0));
+                .uv(16, 26).cuboid(0, -1, -2, 2, 10, 3), ModelTransform.origin(-6, -6, 0));
         root.addChild(EntityModelPartNames.RIGHT_LEG, ModelPartBuilder.create()
                 .uv(26, 9).cuboid(-2, 0, -3, 4, 3, 4)
-                .uv(23, 0).cuboid(-2, 3, -3, 4, 1, 5), ModelTransform.pivot(-2, 20, 0));
+                .uv(23, 0).cuboid(-2, 3, -3, 4, 1, 5), ModelTransform.origin(-2, 20, 0));
         root.addChild(EntityModelPartNames.LEFT_LEG, ModelPartBuilder.create()
                 .uv(0, 25).cuboid(-2, 0, -2, 4, 3, 4)
-                .uv(21, 20).cuboid(-2, 3, -2, 4, 1, 5), ModelTransform.pivot(2, 20, -1));
+                .uv(21, 20).cuboid(-2, 3, -2, 4, 1, 5), ModelTransform.origin(2, 20, -1));
 
         return TexturedModelData.of(data, 64, 64);
     }
@@ -70,7 +70,7 @@ public class CopperGolemEntityModel extends EntityModel<CopperGolemEntityRendere
     public void setAngles(CopperGolemEntityRenderer.State state) {
         super.setAngles(state);
         root.yaw = -MathHelper.PI;
-        head.yaw = state.yawDegrees;
+        head.yaw = state.relativeHeadYaw;
         head.pitch = state.pitch;
 
         float sinAngle = (float)Math.sin(state.handSwingProgress * MathHelper.PI);
@@ -81,24 +81,24 @@ public class CopperGolemEntityModel extends EntityModel<CopperGolemEntityRendere
             leftLeg.pitch = 1.5F;
             leftLeg.yaw = 0.5F;
 
-            rightArm.pitch = 1.25F + 1.125F * MathHelper.wrap(state.limbFrequency, 13) * state.limbAmplitudeMultiplier;
-            leftArm.pitch = 1.25F + 1.125F * MathHelper.wrap(state.limbFrequency, 13) * state.limbAmplitudeMultiplier;
+            rightArm.pitch = 1.25F + 1.125F * MathHelper.wrap(state.limbSwingAnimationProgress, 13) * state.limbSwingAmplitude;
+            leftArm.pitch = 1.25F + 1.125F * MathHelper.wrap(state.limbSwingAnimationProgress, 13) * state.limbSwingAmplitude;
         } else {
             body.pitch = -MathHelper.clamp(sinAngle, 0, 0.25F);
 
             rightLeg.yaw = 0;
-            rightLeg.pitch = MathHelper.cos(state.limbFrequency * 0.6662F) * 1.4F * state.limbAmplitudeMultiplier;
+            rightLeg.pitch = MathHelper.cos(state.limbSwingAnimationProgress * 0.6662F) * 1.4F * state.limbSwingAmplitude;
             leftLeg.yaw = 0;
-            leftLeg.pitch = MathHelper.cos(state.limbFrequency * 0.6662F + (float)Math.PI) * 1.4F * state.limbAmplitudeMultiplier;
+            leftLeg.pitch = MathHelper.cos(state.limbSwingAnimationProgress * 0.6662F + (float)Math.PI) * 1.4F * state.limbSwingAmplitude;
 
             if (state.chasing) {
                 rightArm.pitch = 1.25F + MathHelper.sin(state.age / 2) / 10F;
                 leftArm.pitch = 1.25F + MathHelper.cos(state.age / 2) / 10F;
             } else {
-                rightArm.pitch = 1.5F * MathHelper.wrap(state.limbFrequency, 13) * state.limbAmplitudeMultiplier;
-                rightArm.yaw = -0.5F * MathHelper.wrap(state.limbFrequency, 13) * state.limbAmplitudeMultiplier;
-                leftArm.pitch = -1.5F * MathHelper.wrap(state.limbFrequency, 13) * state.limbAmplitudeMultiplier;
-                leftArm.yaw = 0.5F * MathHelper.wrap(state.limbFrequency, 13) * state.limbAmplitudeMultiplier;
+                rightArm.pitch = 1.5F * MathHelper.wrap(state.limbSwingAnimationProgress, 13) * state.limbSwingAmplitude;
+                rightArm.yaw = -0.5F * MathHelper.wrap(state.limbSwingAnimationProgress, 13) * state.limbSwingAmplitude;
+                leftArm.pitch = -1.5F * MathHelper.wrap(state.limbSwingAnimationProgress, 13) * state.limbSwingAmplitude;
+                leftArm.yaw = 0.5F * MathHelper.wrap(state.limbSwingAnimationProgress, 13) * state.limbSwingAmplitude;
             }
         }
 
@@ -144,7 +144,7 @@ public class CopperGolemEntityModel extends EntityModel<CopperGolemEntityRendere
     public void setArmAngle(Arm arm, MatrixStack matrices) {
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-180));
         matrices.translate(0, 1.3, 0);
-        rightArm.rotate(matrices);
+        rightArm.applyTransform(matrices);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180));
     }
 }

@@ -11,8 +11,11 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.block.OrientationHelper;
+import net.minecraft.world.block.WireOrientation;
 import net.minecraft.world.event.GameEvent;
 
 import org.jetbrains.annotations.Nullable;
@@ -44,8 +47,12 @@ public class CopperButtonBlock extends ButtonBlock {
     @Override
     public void powerOn(BlockState state, World world, BlockPos pos, PlayerEntity player) {
         world.setBlockState(pos, state.with(POWERED, true), Block.NOTIFY_ALL);
-        world.updateNeighborsAlways(pos, this);
-        world.updateNeighborsAlways(pos.offset(ButtonBlock.getDirection(state).getOpposite()), this);
+        Direction direction = getDirection(state).getOpposite();
+        WireOrientation wireOrientation = OrientationHelper.getEmissionOrientation(
+            world, direction, direction.getAxis().isHorizontal() ? Direction.UP : state.get(FACING)
+        );
+        world.updateNeighborsAlways(pos, this, wireOrientation);
+        world.updateNeighborsAlways(pos.offset(direction), this, wireOrientation);
         world.scheduleBlockTick(pos, this, getCustomPressTicks());
         playClickSound(player, world, pos, true);
         world.emitGameEvent(player, GameEvent.BLOCK_ACTIVATE, pos);

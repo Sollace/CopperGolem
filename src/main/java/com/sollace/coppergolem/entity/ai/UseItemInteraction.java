@@ -23,6 +23,7 @@ import com.sollace.coppergolem.entity.ai.LearnedDuties.Duty;
 
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -124,11 +125,9 @@ class UseItemInteraction extends BlockInteraction implements LearnedDuties.Recei
     @Override
     public void readNbt(NbtCompound tag) {
         super.readNbt(tag);
-        readSet(matchingBlocks, tag.getList("matching", NbtElement.STRING_TYPE));
-        readSet(nonMatchingBlocks, tag.getList("nonmatching", NbtElement.STRING_TYPE));
-        if (tag.contains("learnedDuties", NbtElement.COMPOUND_TYPE)) {
-            learnedDuties.readNbt(tag.getCompound("learnedDuties"));
-        }
+        readSet(matchingBlocks, tag.getList("matching"));
+        readSet(nonMatchingBlocks, tag.getList("nonmatching"));
+        learnedDuties.readNbt(tag.getCompoundOrEmpty("learnedDuties"));
     }
 
     @Override
@@ -147,8 +146,14 @@ class UseItemInteraction extends BlockInteraction implements LearnedDuties.Recei
         return list;
     }
 
-    private static void readSet(Set<Identifier> set, NbtList list) {
+    private static void readSet(Set<Identifier> set, Optional<NbtList> list) {
         set.clear();
-        list.stream().map(NbtElement::asString).map(Identifier::tryParse).filter(Objects::nonNull).forEach(set::add);
+        list.stream()
+            .flatMap(NbtList::stream)
+            .map(NbtElement::asString)
+            .flatMap(Optional::stream)
+            .map(Identifier::tryParse)
+            .filter(Objects::nonNull)
+            .forEach(set::add);
     }
 }

@@ -21,7 +21,7 @@ public abstract class BlockInteraction extends PositionFinder {
     }
 
     public static BlockInteraction fromNbt(CopperGolemEntity golem, NbtCompound tag) {
-        var instance = "use_item".equals(tag.getString("id"))
+        var instance = "use_item".equals(tag.getString("id", ""))
                 ? new UseItemInteraction(golem, 0)
                 : new ClickButtonInteraction(golem, 0);
         instance.readNbt(tag);

@@ -42,7 +42,7 @@ public class LearnedDuties {
             Identifier id = Identifier.tryParse(key);
             if (id != null) {
                 Entry entry = new Entry(id);
-                entry.readNbt(tag.getCompound(key));
+                entry.readNbt(tag.getCompoundOrEmpty(key));
                 entries.put(id, entry);
             }
         });
@@ -67,7 +67,7 @@ public class LearnedDuties {
 
         public void readNbt(NbtCompound tag) {
             duties.clear();
-            Arrays.stream(tag.getIntArray("duties")).filter(i -> i >= 0 && i < 3).distinct().forEach(index -> {
+            tag.getIntArray("duties").stream().flatMapToInt(ar -> Arrays.stream(ar)).filter(i -> i >= 0 && i < 3).distinct().forEach(index -> {
                 duties.add(Duty.values()[index]);
             });
         }
